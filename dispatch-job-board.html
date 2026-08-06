@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DISPATCH — Job Postings, Delivered</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2430;
+    --ink-soft:#2A3644;
+    --ink-70:rgba(27,36,48,0.68);
+    --ink-45:rgba(27,36,48,0.45);
+    --paper:#F7F4EC;
+    --paper-dark:#EDE7D6;
+    --paper-line: rgba(27,36,48,0.14);
+    --gold:#C9A54D;
+    --gold-deep:#A9822F;
+    --teal:#3F6C6B;
+    --rust:#B5533C;
+    --white:#FFFDF8;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+  }
+  ::selection{background:var(--gold); color:var(--ink);}
+  h1,h2,h3,.display{
+    font-family:'Fraunces',serif;
+    letter-spacing:-0.01em;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;}
+  button{font-family:inherit; cursor:pointer;}
+  .hidden{display:none !important;}
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    background:var(--ink);
+    color:var(--paper);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:16px 28px;
+    border-bottom:3px solid var(--gold);
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Fraunces',serif; font-weight:700; font-size:22px;
+    letter-spacing:-0.02em;
+  }
+  .brand .stamp{
+    width:30px;height:30px;border:2px solid var(--gold);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--gold);
+    transform:rotate(-8deg);
+  }
+  .brand .tag{
+    font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em;
+    color:rgba(247,244,236,0.55); text-transform:uppercase; font-weight:500;
+    margin-left:6px; border-left:1px solid rgba(247,244,236,0.25); padding-left:10px;
+  }
+  .topbar-right{display:flex; align-items:center; gap:14px; font-size:13px;}
+  .who{font-family:'IBM Plex Mono',monospace; font-size:12px; color:rgba(247,244,236,0.75);}
+  .who b{color:var(--paper);}
+  .btn{
+    border:none; border-radius:3px; padding:9px 16px; font-size:13px; font-weight:600;
+    letter-spacing:0.02em;
+  }
+  .btn-gold{background:var(--gold); color:var(--ink);}
+  .btn-gold:hover{background:var(--gold-deep);}
+  .btn-ghost{background:transparent; border:1px solid rgba(247,244,236,0.35); color:var(--paper);}
+  .btn-ghost:hover{border-color:var(--gold); color:var(--gold);}
+  .btn-dark{background:var(--ink); color:var(--paper);}
+  .btn-dark:hover{background:var(--ink-soft);}
+  .btn-outline{background:transparent;border:1.5px solid var(--ink); color:var(--ink);}
+  .btn-outline:hover{background:var(--ink); color:var(--paper);}
+  .btn-danger{background:transparent; border:1px solid var(--rust); color:var(--rust);}
+  .btn-danger:hover{background:var(--rust); color:var(--white);}
+  .btn:disabled{opacity:0.45; cursor:not-allowed;}
+
+  /* ---------- Auth screen ---------- */
+  #view-auth{
+    min-height:calc(100vh - 68px);
+    display:flex; align-items:center; justify-content:center;
+    padding:40px 20px;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(201,165,77,0.10), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(63,108,107,0.10), transparent 40%),
+      var(--paper);
+  }
+  .auth-wrap{display:flex; max-width:920px; width:100%; background:var(--white); border:1px solid var(--paper-line); border-radius:6px; overflow:hidden; box-shadow:0 20px 50px rgba(27,36,48,0.10);}
+  .auth-side{
+    flex:1; background:var(--ink); color:var(--paper); padding:44px 38px;
+    display:flex; flex-direction:column; justify-content:space-between;
+    position:relative; min-width:280px;
+  }
+  .auth-side::after{
+    content:""; position:absolute; right:-14px; top:0; bottom:0; width:28px;
+    background-image: radial-gradient(circle, var(--paper) 5px, transparent 5.5px);
+    background-size: 28px 22px; background-position: center;
+  }
+  .auth-side h1{font-size:34px; line-height:1.05; margin:0 0 14px;}
+  .auth-side p{font-size:14px; color:rgba(247,244,236,0.7); line-height:1.6; max-width:320px;}
+  .ticket-code{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:var(--gold); text-transform:uppercase;}
+  .auth-form{flex:1.15; padding:44px 42px; min-width:320px;}
+  .tabs{display:flex; gap:6px; margin-bottom:26px; border-bottom:1px solid var(--paper-line);}
+  .tab{
+    padding:9px 4px 12px; margin-right:22px; font-size:14px; font-weight:600; color:var(--ink-45);
+    border-bottom:2px solid transparent; background:none; border-top:none; border-left:none; border-right:none;
+  }
+  .tab.active{color:var(--ink); border-bottom-color:var(--gold);}
+  label{display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-70); margin:14px 0 6px;}
+  label:first-child{margin-top:0;}
+  input[type=text], input[type=password], input[type=email], select, textarea{
+    width:100%; padding:11px 12px; border:1px solid var(--paper-line); border-radius:3px;
+    font-size:14px; font-family:'Inter',sans-serif; background:var(--paper); color:var(--ink);
+  }
+  input:focus, select:focus, textarea:focus{outline:2px solid var(--gold); outline-offset:1px; background:var(--white);}
+  .role-pick{display:flex; gap:10px; margin-top:6px;}
+  .role-opt{flex:1; border:1px solid var(--paper-line); border-radius:4px; padding:10px; text-align:center; font-size:12.5px; font-weight:600; background:var(--paper);}
+  .role-opt.selected{border-color:var(--gold); background:rgba(201,165,77,0.14); color:var(--ink);}
+  .msg-line{font-size:12.5px; margin-top:12px; padding:9px 11px; border-radius:3px;}
+  .msg-err{background:rgba(181,83,60,0.10); color:var(--rust); border:1px solid rgba(181,83,60,0.3);}
+  .msg-ok{background:rgba(63,108,107,0.10); color:var(--teal); border:1px solid rgba(63,108,107,0.3);}
+  .hint{font-size:11.5px; color:var(--ink-45); margin-top:16px; line-height:1.5;}
+  .submit-row{margin-top:22px;}
+  .submit-row .btn{width:100%; padding:12px;}
+
+  /* ---------- App shell ---------- */
+  #app-shell{display:flex; min-height:calc(100vh - 68px);}
+  .sidebar{
+    width:210px; background:var(--ink); color:var(--paper); padding:24px 0; flex-shrink:0;
+  }
+  .side-link{
+    display:block; width:100%; text-align:left; background:none; border:none; color:rgba(247,244,236,0.62);
+    padding:12px 24px; font-size:13.5px; font-weight:500; border-left:3px solid transparent;
+  }
+  .side-link:hover{color:var(--paper);}
+  .side-link.active{color:var(--paper); border-left-color:var(--gold); background:rgba(201,165,77,0.08); font-weight:600;}
+  .side-badge{
+    display:inline-block; margin-left:6px; background:var(--rust); color:var(--white); border-radius:20px;
+    font-size:10px; padding:1px 6px; font-family:'IBM Plex Mono',monospace;
+  }
+  .main{flex:1; padding:32px 40px; max-width:1080px;}
+  .page-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:22px; flex-wrap:wrap; gap:10px;}
+  .page-head h2{font-size:26px; margin:0;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-45); margin:0 0 4px;}
+
+  /* ---------- Ticket job card ---------- */
+  .job-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:18px;}
+  .ticket{
+    background:var(--white); border:1px solid var(--paper-line); border-radius:6px; overflow:hidden;
+    display:flex; flex-direction:column; box-shadow:0 2px 0 rgba(27,36,48,0.03);
+  }
+  .ticket-body{padding:18px 18px 14px;}
+  .ticket-body .co{font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal); margin:0 0 6px;}
+  .ticket-body h3{font-size:18px; margin:0 0 8px; line-height:1.2;}
+  .ticket-meta{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;}
+  .pill{font-size:11px; padding:3px 9px; border-radius:20px; background:var(--paper-dark); color:var(--ink-70); font-weight:600;}
+  .ticket-desc{font-size:13px; color:var(--ink-70); line-height:1.55; margin:0 0 4px; max-height:4.6em; overflow:hidden;}
+  .perf{
+    border-top:2px dashed var(--paper-line); position:relative;
+  }
+  .perf::before, .perf::after{
+    content:""; position:absolute; top:-8px; width:16px; height:16px; background:var(--paper); border-radius:50%;
+  }
+  .perf::before{left:-8px;} .perf::after{right:-8px;}
+  .ticket-stub{
+    display:flex; align-items:center; justify-content:space-between; padding:12px 18px; background:var(--paper-dark);
+  }
+  .job-code{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-45);}
+
+  /* ---------- Stamp badge ---------- */
+  .stamp-badge{
+    display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:600;
+    text-transform:uppercase; letter-spacing:0.08em; padding:4px 10px; border:1.5px solid currentColor;
+    border-radius:3px; transform:rotate(-2deg);
+  }
+  .s-submitted{color:var(--teal);}
+  .s-reviewing{color:var(--gold-deep);}
+  .s-interview{color:#5B6FB0;}
+  .s-hired{color:#2F7D4F;}
+  .s-rejected{color:var(--rust);}
+  .s-open{color:var(--teal);}
+  .s-closed{color:var(--ink-45);}
+
+  /* ---------- Generic cards / tables ---------- */
+  .card{background:var(--white); border:1px solid var(--paper-line); border-radius:6px; padding:20px;}
+  .app-row{
+    background:var(--white); border:1px solid var(--paper-line); border-radius:6px; padding:16px 18px;
+    display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:12px; flex-wrap:wrap;
+  }
+  .app-row .left{flex:1; min-width:200px;}
+  .app-row h4{margin:0 0 4px; font-size:15.5px;}
+  .app-row .sub{font-size:12px; color:var(--ink-45); font-family:'IBM Plex Mono',monospace;}
+  .app-row .right{display:flex; align-items:center; gap:10px;}
+  select.status-sel{width:auto; padding:7px 10px; font-size:12px;}
+  .empty{
+    border:1.5px dashed var(--paper-line); border-radius:6px; padding:36px 20px; text-align:center; color:var(--ink-45);
+  }
+  .empty .display{font-size:18px; color:var(--ink-70); margin-bottom:6px;}
+
+  /* ---------- Modal ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(27,36,48,0.55); display:flex; align-items:center; justify-content:center;
+    padding:20px; z-index:50;
+  }
+  .modal{
+    background:var(--white); border-radius:6px; max-width:520px; width:100%; padding:26px 28px; max-height:88vh; overflow:auto;
+  }
+  .modal h3{margin:0 0 4px;}
+  .modal .sub{font-size:12.5px; color:var(--ink-45); margin-bottom:18px; font-family:'IBM Plex Mono',monospace;}
+  .modal-actions{display:flex; gap:10px; margin-top:20px; justify-content:flex-end;}
+
+  /* ---------- Messages ---------- */
+  .msg-layout{display:flex; gap:0; border:1px solid var(--paper-line); border-radius:6px; overflow:hidden; background:var(--white); height:560px;}
+  .thread-list{width:230px; border-right:1px solid var(--paper-line); overflow-y:auto; flex-shrink:0;}
+  .thread-item{
+    display:block; width:100%; text-align:left; padding:13px 16px; border:none; border-bottom:1px solid var(--paper-line);
+    background:var(--white); font-size:13px;
+  }
+  .thread-item.active{background:var(--paper-dark);}
+  .thread-item .tname{font-weight:600; margin-bottom:2px;}
+  .thread-item .tprev{font-size:11.5px; color:var(--ink-45); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .chat-col{flex:1; display:flex; flex-direction:column;}
+  .chat-head{padding:14px 18px; border-bottom:1px solid var(--paper-line); font-weight:600; font-size:14px;}
+  .chat-scroll{flex:1; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:10px;}
+  .bubble{max-width:72%; padding:9px 13px; border-radius:8px; font-size:13.5px; line-height:1.45;}
+  .bubble .t{font-size:10px; opacity:0.55; margin-top:4px; font-family:'IBM Plex Mono',monospace;}
+  .bubble.mine{align-self:flex-end; background:var(--ink); color:var(--paper); border-bottom-right-radius:2px;}
+  .bubble.theirs{align-self:flex-start; background:var(--paper-dark); color:var(--ink); border-bottom-left-radius:2px;}
+  .chat-input{display:flex; gap:8px; padding:14px; border-top:1px solid var(--paper-line);}
+  .chat-input textarea{resize:none; height:44px; padding-top:11px;}
+
+  @media (max-width:760px){
+    #app-shell{flex-direction:column;}
+    .sidebar{width:100%; display:flex; overflow-x:auto; padding:10px 6px;}
+    .side-link{padding:8px 14px; border-left:none; border-bottom:3px solid transparent; white-space:nowrap;}
+    .side-link.active{border-left-color:transparent; border-bottom-color:var(--gold);}
+    .main{padding:22px 16px;}
+    .auth-wrap{flex-direction:column;}
+    .auth-side::after{display:none;}
+    .msg-layout{flex-direction:column; height:auto;}
+    .thread-list{width:100%; max-height:180px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="stamp">DP</div>
+    DISPATCH
+    <span class="tag">Job postings, delivered</span>
+  </div>
+  <div class="topbar-right" id="topbar-right"></div>
+</div>
+
+<!-- ===================== AUTH VIEW ===================== -->
+<div id="view-auth">
+  <div class="auth-wrap">
+    <div class="auth-side">
+      <div>
+        <div class="ticket-code" id="auth-side-eyebrow">ADMIT ONE · CAREER DESK</div>
+        <h1>Your next role,<br>dispatched.</h1>
+        <p>Browse open postings, apply in a click, or hand the whole search to our desk with <b style="color:var(--paper)">Apply For Me</b> — and message us anytime while it's in motion.</p>
+      </div>
+      <p style="margin-top:30px;">Recruiters get a control desk to post roles, track every applicant, and reply straight from the same thread.</p>
+    </div>
+    <div class="auth-form">
+      <div class="tabs">
+        <button class="tab active" id="tab-login" onclick="switchAuthTab('login')">Log in</button>
+        <button class="tab" id="tab-signup" onclick="switchAuthTab('signup')">Create account</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="pane-login">
+        <label>Username</label>
+        <input type="text" id="login-username" placeholder="e.g. jordan">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••">
+        <div class="submit-row"><button class="btn btn-dark" onclick="doLogin()">Log in</button></div>
+        <div id="login-msg"></div>
+        <div class="hint">Demo admin desk — username <b>admin</b>, password <b>admin123</b>.</div>
+      </div>
+
+      <!-- SIGNUP -->
+      <div id="pane-signup" class="hidden">
+        <label>Full name</label>
+        <input type="text" id="su-name" placeholder="Jordan Cruz">
+        <label>Username</label>
+        <input type="text" id="su-username" placeholder="pick a username">
+        <label>Email</label>
+        <input type="email" id="su-email" placeholder="you@example.com">
+        <label>Password</label>
+        <input type="password" id="su-password" placeholder="at least 4 characters">
+        <label>I'm signing up as</label>
+        <div class="role-pick">
+          <button type="button" class="role-opt selected" id="role-client" onclick="pickRole('client')">Job seeker</button>
+          <button type="button" class="role-opt" id="role-admin" onclick="pickRole('admin')">Admin / recruiter</button>
+        </div>
+        <div id="admin-code-wrap" class="hidden">
+          <label>Recruiter access code</label>
+          <input type="text" id="su-admincode" placeholder="ask your team lead">
+        </div>
+        <div class="submit-row"><button class="btn btn-gold" onclick="doSignup()">Create account</button></div>
+        <div id="signup-msg"></div>
+        <div class="hint">Data for this demo is stored for everyone using this app instance — don't use a real password you use elsewhere.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== APP SHELL ===================== -->
+<div id="app-shell" class="hidden">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="main" id="main"></div>
+</div>
+
+<!-- Modal root -->
+<div id="modal-root"></div>
+
+<script>
+/* ============================================================
+   STORAGE HELPERS
+   ============================================================ */
+async function sget(key){
+  try{ const r = await window.storage.get(key, true); return r ? JSON.parse(r.value) : null; }
+  catch(e){ return null; }
+}
+async function sset(key, val){
+  try{ return await window.storage.set(key, JSON.stringify(val), true); }
+  catch(e){ console.error('storage set failed', e); return null; }
+}
+async function sdel(key){
+  try{ return await window.storage.delete(key, true); } catch(e){ return null; }
+}
+async function slist(prefix){
+  try{ const r = await window.storage.list(prefix, true); return r ? r.keys : []; }
+  catch(e){ return []; }
+}
+
+/* ============================================================
+   APP STATE
+   ============================================================ */
+let currentUser = null;      // {username, role, name, email}
+let selectedRole = 'client';
+let currentAdminSection = 'postings';
+let currentClientSection = 'jobs';
+let activeThreadUser = null; // for messaging
+let pollTimer = null;
+let jobModalDraft = null;
+
+const ADMIN_CODE = 'HR-ADMIN-2026';
+
+/* ============================================================
+   INIT / SEED
+   ============================================================ */
+async function init(){
+  // seed admin account if missing
+  const existingAdmin = await sget('users:admin');
+  if(!existingAdmin){
+    await sset('users:admin', {username:'admin', password:'admin123', role:'admin', name:'Desk Admin', email:'admin@dispatch.example', createdAt:Date.now()});
+  }
+  // seed counters
+  const counters = await sget('meta:counters');
+  if(!counters){ await sset('meta:counters', {jobSeq:1, appSeq:1}); }
+  // seed a couple of sample jobs if none exist
+  const jobKeys = await slist('jobs:');
+  if(jobKeys.length === 0){
+    await createJob({title:'Product Designer', company:'Northline Studio', location:'Remote', type:'Full-time', salary:'$85k–$105k',
+      description:'Own end-to-end design for our booking product, from early sketches to shipped flows. Youll work closely with two engineers and our founder.'}, true);
+    await createJob({title:'Backend Engineer', company:'Coral Freight Co.', location:'Austin, TX', type:'Full-time', salary:'$110k–$140k',
+      description:'Build and maintain the routing services that power our logistics platform. Go or similar strongly typed language experience preferred.'}, true);
+    await createJob({title:'Customer Support Specialist', company:'Northline Studio', location:'Hybrid — Denver', type:'Part-time', salary:'$24/hr',
+      description:'Front-line support for our small but mighty customer base. Youll triage tickets, write help docs, and flag product issues.'}, true);
+  }
+  renderAuthScreen();
+}
+
+/* ============================================================
+   AUTH SCREEN LOGIC
+   ============================================================ */
+function switchAuthTab(which){
+  document.getElementById('tab-login').classList.toggle('active', which==='login');
+  document.getElementById('tab-signup').classList.toggle('active', which==='signup');
+  document.getElementById('pane-login').classList.toggle('hidden', which!=='login');
+  document.getElementById('pane-signup').classList.toggle('hidden', which!=='signup');
+}
+function pickRole(role){
+  selectedRole = role;
+  document.getElementById('role-client').classList.toggle('selected', role==='client');
+  document.getElementById('role-admin').classList.toggle('selected', role==='admin');
+  document.getElementById('admin-code-wrap').classList.toggle('hidden', role!=='admin');
+}
+function showMsg(elId, text, ok){
+  const el = document.getElementById(elId);
+  el.innerHTML = `<div class="msg-line ${ok?'msg-ok':'msg-err'}">${text}</div>`;
+}
+
+async function doLogin(){
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value;
+  if(!username || !password){ showMsg('login-msg','Enter a username and password.'); return; }
+  const user = await sget('users:'+username);
+  if(!user || user.password !== password){ showMsg('login-msg','That username or password doesn\'t match.'); return; }
+  currentUser = {username:user.username, role:user.role, name:user.name, email:user.email};
+  enterApp();
+}
+
+async function doSignup(){
+  const name = document.getElementById('su-name').value.trim();
+  const username = document.getElementById('su-username').value.trim();
+  const email = document.getElementById('su-email').value.trim();
+  const password = document.getElementById('su-password').value;
+  if(!name || !username || !email || !password){ showMsg('signup-msg','Fill in every field to continue.'); return; }
+  if(password.length < 4){ showMsg('signup-msg','Password should be at least 4 characters.'); return; }
+  if(selectedRole === 'admin'){
+    const code = document.getElementById('su-admincode').value.trim();
+    if(code !== ADMIN_CODE){ showMsg('signup-msg','That recruiter access code isn\'t right.'); return; }
+  }
+  const existing = await sget('users:'+username);
+  if(existing){ showMsg('signup-msg','That username is taken — try another.'); return; }
+  const user = {username, password, role:selectedRole, name, email, createdAt:Date.now()};
+  await sset('users:'+username, user);
+  currentUser = {username, role:selectedRole, name, email};
+  enterApp();
+}
+
+function doLogout(){
+  currentUser = null;
+  activeThreadUser = null;
+  if(pollTimer){ clearInterval(pollTimer); pollTimer = null; }
+  document.getElementById('app-shell').classList.add('hidden');
+  document.getElementById('view-auth').classList.remove('hidden');
+  document.getElementById('topbar-right').innerHTML = '';
+  document.getElementById('login-username').value='';
+  document.getElementById('login-password').value='';
+}
+
+function renderAuthScreen(){
+  document.getElementById('view-auth').classList.remove('hidden');
+  document.getElementById('app-shell').classList.add('hidden');
+}
+
+/* ============================================================
+   ENTER APP
+   ============================================================ */
+function enterApp(){
+  document.getElementById('view-auth').classList.add('hidden');
+  document.getElementById('app-shell').classList.remove('hidden');
+  document.getElementById('topbar-right').innerHTML = `
+    <span class="who">Signed in as <b>${escapeHtml(currentUser.name)}</b> · ${currentUser.role === 'admin' ? 'Desk Admin' : 'Job seeker'}</span>
+    <button class="btn btn-ghost" onclick="doLogout()">Log out</button>
+  `;
+  if(currentUser.role === 'admin'){
+    currentAdminSection = 'postings';
+    renderAdminShell();
+  } else {
+    currentClientSection = 'jobs';
+    renderClientShell();
+  }
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(refreshActiveView, 4000);
+}
+
+function refreshActiveView(){
+  if(!currentUser) return;
+  if(currentUser.role === 'admin') renderAdminMain();
+  else renderClientMain();
+}
+
+function escapeHtml(str){
+  if(str===undefined || str===null) return '';
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function timeAgo(ts){
+  const diff = Date.now() - ts;
+  const mins = Math.floor(diff/60000);
+  if(mins < 1) return 'just now';
+  if(mins < 60) return mins+'m ago';
+  const hrs = Math.floor(mins/60);
+  if(hrs < 24) return hrs+'h ago';
+  const days = Math.floor(hrs/24);
+  return days+'d ago';
+}
+
+/* ============================================================
+   JOB DATA HELPERS
+   ============================================================ */
+async function nextSeq(field){
+  const counters = (await sget('meta:counters')) || {jobSeq:1, appSeq:1};
+  const val = counters[field];
+  counters[field] = val + 1;
+  await sset('meta:counters', counters);
+  return val;
+}
+async function createJob(data, silent){
+  const seq = await nextSeq('jobSeq');
+  const id = 'job'+seq;
+  const code = 'DSP-'+String(seq).padStart(4,'0');
+  const job = {
+    id, code, title:data.title, company:data.company, location:data.location, type:data.type,
+    salary:data.salary || '', description:data.description, status:'open',
+    postedBy: silent ? 'admin' : currentUser.username, postedAt: Date.now()
+  };
+  await sset('jobs:'+id, job);
+  return job;
+}
+async function getAllJobs(){
+  const keys = await slist('jobs:');
+  const jobs = await Promise.all(keys.map(k => sget(k)));
+  return jobs.filter(Boolean).sort((a,b)=>b.postedAt-a.postedAt);
+}
+async function getAllApplications(){
+  const keys = await slist('applications:');
+  const apps = await Promise.all(keys.map(k => sget(k)));
+  return apps.filter(Boolean).sort((a,b)=>b.createdAt-a.createdAt);
+}
+async function getUserApplications(username){
+  const apps = await getAllApplications();
+  return apps.filter(a=>a.username===username);
+}
+async function createApplication(data){
+  const seq = await nextSeq('appSeq');
+  const id = 'app'+seq;
+  const app = {
+    id, refCode:'APP-'+String(seq).padStart(5,'0'),
+    jobId: data.jobId || null, jobTitle: data.jobTitle, company: data.company || '',
+    username: currentUser.username, name: currentUser.name,
+    type: data.type, note: data.note || '',
+    status:'submitted', createdAt: Date.now(), updatedAt: Date.now()
+  };
+  await sset('applications:'+id, app);
+  return app;
+}
+async function updateApplicationStatus(id, status){
+  const app = await sget('applications:'+id);
+  if(!app) return;
+  app.status = status; app.updatedAt = Date.now();
+  await sset('applications:'+id, app);
+}
+
+/* ============================================================
+   MESSAGES
+   ============================================================ */
+async function getThread(username){
+  const t = await sget('messages:'+username);
+  return t || [];
+}
+async function sendMessage(username, fromRole, text){
+  const t = await getThread(username);
+  t.push({from: fromRole, text, ts: Date.now()});
+  await sset('messages:'+username, t);
+}
+async function getAllClientUsernamesWithActivity(){
+  const userKeys = await slist('users:');
+  const users = await Promise.all(userKeys.map(k=>sget(k)));
+  const clients = users.filter(u => u && u.role === 'client');
+  return clients;
+}
+
+/* ============================================================
+   CLIENT SHELL
+   ============================================================ */
+function renderClientShell(){
+  document.getElementById('sidebar').innerHTML = `
+    <button class="side-link" data-sec="jobs" onclick="setClientSection('jobs')">Browse jobs</button>
+    <button class="side-link" data-sec="applyforme" onclick="setClientSection('applyforme')">Apply for me</button>
+    <button class="side-link" data-sec="applications" onclick="setClientSection('applications')">My applications</button>
+    <button class="side-link" data-sec="messages" onclick="setClientSection('messages')">Messages</button>
+  `;
+  renderClientMain();
+}
+function setClientSection(sec){
+  currentClientSection = sec;
+  renderClientMain();
+}
+async function renderClientMain(){
+  document.querySelectorAll('#sidebar .side-link').forEach(b=>b.classList.toggle('active', b.dataset.sec===currentClientSection));
+  const main = document.getElementById('main');
+  if(currentClientSection === 'jobs') return renderClientJobs(main);
+  if(currentClientSection === 'applyforme') return renderApplyForMe(main);
+  if(currentClientSection === 'applications') return renderClientApplications(main);
+  if(currentClientSection === 'messages') return renderClientMessages(main);
+}
+
+async function renderClientJobs(main){
+  const jobs = (await getAllJobs()).filter(j=>j.status==='open');
+  main.innerHTML = `
+    <div class="page-head">
+      <div><div class="eyebrow">Open roles</div><h2>Browse postings</h2></div>
+    </div>
+    <div class="job-grid" id="job-grid"></div>
+  `;
+  const grid = document.getElementById('job-grid');
+  if(jobs.length === 0){
+    grid.innerHTML = `<div class="empty"><div class="display">Nothing posted yet</div>Check back soon — new roles land here as they're dispatched.</div>`;
+    return;
+  }
+  grid.innerHTML = jobs.map(j => `
+    <div class="ticket">
+      <div class="ticket-body">
+        <p class="co">${escapeHtml(j.company)}</p>
+        <h3>${escapeHtml(j.title)}</h3>
+        <div class="ticket-meta">
+          <span class="pill">${escapeHtml(j.location)}</span>
+          <span class="pill">${escapeHtml(j.type)}</span>
+          ${j.salary ? `<span class="pill">${escapeHtml(j.salary)}</span>` : ''}
+        </div>
+        <p class="ticket-desc">${escapeHtml(j.description)}</p>
+      </div>
+      <div class="perf"></div>
+      <div class="ticket-stub">
+        <span class="job-code">${j.code}</span>
+        <button class="btn btn-gold" onclick="openApplyModal('${j.id}')">Apply →</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openApplyModal(jobId){
+  getAllJobs().then(jobs => {
+    const job = jobs.find(j=>j.id===jobId);
+    if(!job) return;
+    document.getElementById('modal-root').innerHTML = `
+      <div class="overlay" onclick="if(event.target===this) closeModal()">
+        <div class="modal">
+          <h3>Apply — ${escapeHtml(job.title)}</h3>
+          <div class="sub">${job.code} · ${escapeHtml(job.company)}</div>
+          <label>A short note to the desk (optional)</label>
+          <textarea id="apply-note" rows="5" placeholder="Anything you'd like the recruiter to know — availability, relevant experience, links..."></textarea>
+          <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-gold" onclick="submitApplication('${job.id}','${escapeHtml(job.title).replace(/'/g,"\\'")}','${escapeHtml(job.company).replace(/'/g,"\\'")}')">Submit application</button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+}
+function closeModal(){ document.getElementById('modal-root').innerHTML = ''; }
+
+async function submitApplication(jobId, jobTitle, company){
+  const note = document.getElementById('apply-note').value.trim();
+  await createApplication({jobId, jobTitle, company, type:'self', note});
+  closeModal();
+  setClientSection('applications');
+}
+
+function renderApplyForMe(main){
+  main.innerHTML = `
+    <div class="page-head">
+      <div><div class="eyebrow">White-glove search</div><h2>Apply for me</h2></div>
+    </div>
+    <div class="card" style="max-width:640px;">
+      <p style="font-size:13.5px; color:var(--ink-70); line-height:1.6; margin-top:0;">
+        Tell the desk what you're looking for and we'll search, tailor, and submit applications on your behalf.
+        Track progress and chat with us any time from <b>Messages</b>.
+      </p>
+      <label>Role or field you're targeting</label>
+      <input type="text" id="afm-role" placeholder="e.g. Senior Product Designer, remote">
+      <label>Tell us about yourself &amp; what you're looking for</label>
+      <textarea id="afm-note" rows="6" placeholder="Experience, salary range, locations you'll consider, links to portfolio/resume, timeline..."></textarea>
+      <div class="submit-row"><button class="btn btn-gold" onclick="submitApplyForMe()">Send to the desk</button></div>
+      <div id="afm-msg"></div>
+    </div>
+  `;
+}
+async function submitApplyForMe(){
+  const role = document.getElementById('afm-role').value.trim();
+  const note = document.getElementById('afm-note').value.trim();
+  if(!role || !note){ showMsg('afm-msg','Add a target role and a bit about yourself so we have something to work with.'); return; }
+  await createApplication({jobId:null, jobTitle:role, company:'', type:'apply_for_me', note});
+  await sendMessage(currentUser.username, 'client', `New Apply For Me request: "${role}" — ${note}`);
+  showMsg('afm-msg','Sent! The desk will review and reach out in Messages.', true);
+  document.getElementById('afm-role').value=''; document.getElementById('afm-note').value='';
+}
+
+async function renderClientApplications(main){
+  const apps = await getUserApplications(currentUser.username);
+  main.innerHTML = `
+    <div class="page-head">
+      <div><div class="eyebrow">Status board</div><h2>My applications</h2></div>
+    </div>
+    <div id="apps-list"></div>
+  `;
+  const list = document.getElementById('apps-list');
+  if(apps.length===0){
+    list.innerHTML = `<div class="empty"><div class="display">No applications yet</div>Applications you submit — direct or via Apply For Me — will show up here.</div>`;
+    return;
+  }
+  list.innerHTML = apps.map(a => `
+    <div class="app-row">
+      <div class="left">
+        <h4>${escapeHtml(a.jobTitle)} ${a.company ? '· '+escapeHtml(a.company) : ''}</h4>
+        <div class="sub">${a.refCode} · ${a.type==='apply_for_me' ? 'Apply For Me' : 'Direct application'} · ${timeAgo(a.createdAt)}</div>
+      </div>
+      <div class="right"><span class="stamp-badge s-${a.status}">${statusLabel(a.status)}</span></div>
+    </div>
+  `).join('');
+}
+function statusLabel(s){
+  return {submitted:'Dispatched', reviewing:'In review', interview:'Interview', hired:'Hired', rejected:'Not moving forward', open:'Open', closed:'Closed'}[s] || s;
+}
+
+async function renderClientMessages(main){
+  const thread = await getThread(currentUser.username);
+  main.innerHTML = `
+    <div class="page-head">
+      <div><div class="eyebrow">Direct line</div><h2>Messages with the desk</h2></div>
+    </div>
+    <div class="msg-layout" style="max-width:640px;">
+      <div class="chat-col">
+        <div class="chat-head">Desk Admin</div>
+        <div class="chat-scroll" id="chat-scroll"></div>
+        <div class="chat-input">
+          <textarea id="chat-input-box" placeholder="Write a message..."></textarea>
+          <button class="btn btn-dark" onclick="clientSend()">Send</button>
+        </div>
+      </div>
+    </div>
+  `;
+  const scroll = document.getElementById('chat-scroll');
+  if(thread.length===0){
+    scroll.innerHTML = `<div class="empty">No messages yet. Say hello, or ask about an application.</div>`;
+  } else {
+    scroll.innerHTML = thread.map(m => `
+      <div class="bubble ${m.from==='client'?'mine':'theirs'}">
+        ${escapeHtml(m.text)}
+        <div class="t">${m.from==='client'?'You':'Desk'} · ${timeAgo(m.ts)}</div>
+      </div>
+    `).join('');
+    scroll.scrollTop = scroll.scrollHeight;
+  }
+}
+async function clientSend(){
+  const box = document.getElementById('chat-input-box');
+  const text = box.value.trim();
+  if(!text) return;
+  box.value='';
+  await sendMessage(currentUser.username, 'client', text);
+  renderClientMessages(document.getElementById('main'));
+}
+
+/* ============================================================
+   ADMIN SHELL
+   ============================================================ */
+function renderAdminShell(){
+  document.getElementById('sidebar').innerHTML = `
+    <button class="side-link" data-sec="postings" onclick="setAdminSection('postings')">Postings</button>
+    <button class="side-link" data-sec="applications" onclick="setAdminSection('applications')">Applications</button>
+    <button class="side-link" data-sec="messages" onclick="setAdminSection('messages')">Messages</button>
+  `;
+  renderAdminMain();
+}
+function setAdminSection(sec){
+  currentAdminSection = sec;
+  if(sec !== 'messages') activeThreadUser = null;
+  renderAdminMain();
+}
+async function renderAdminMain(){
+  document.querySelectorAll('#sidebar .side-link').forEach(b=>b.classList.toggle('active', b.dataset.sec===currentAdminSection));
+  const main = document.getElementById('main');
+  if(currentAdminSection === 'postings') return renderAdminPostings(main);
+  if(currentAdminSection === 'applications') return renderAdminApplications(main);
+  if(currentAdminSection === 'messages') return renderAdminMessages(main);
+}
+
+async function renderAdminPostings(main){
+  const jobs = await getAllJobs();
+  main.innerHTML = `
+    <div class="page-head">
+      <div><div class="eyebrow">Control desk</div><h2>Postings</h2></div>
+      <button class="btn btn-gold" onclick="openJobModal()">+ New posting</button>
+    </div>
+    <div id="admin-jobs"></div>
+  `;
+  const wrap = document.getElementById('admin-jobs');
+  if(jobs.length===0){
+    wrap.innerHTML = `<div class="empty"><div class="display">No postings yet</div>Create your first posting to get it in front of job seekers.</div>`;
+    return;
+  }
+  wrap.innerHTML = jobs.map(j => `
+    <div class="app-row">
+      <div class="left">
+        <h4>${escapeHtml(j.title)} <span class="stamp-badge s-${j.status}" style="margin-left:6px;">${statusLabel(j.status)}</span></h4>
+        <div class="sub">${j.code} · ${escapeHtml(j.company)} · ${escapeHtml(j.location)} · ${timeAgo(j.postedAt)}</div>
+      </div>
+      <div class="right">
+        <button class="btn btn-outline" onclick='openJobModal(${JSON.stringify(j.id)})'>Edit</button>
+        <button class="btn btn-outline" onclick="toggleJobStatus('${j.id}','${j.status}')">${j.status==='open'?'Close':'Reopen'}</button>
+        <button class="btn btn-danger" onclick="deleteJob('${j.id}')">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+async function toggleJobStatus(id, status){
+  const job = await sget('jobs:'+id);
+  if(!job) return;
+  job.status = status==='open' ? 'closed' : 'open';
+  await sset('jobs:'+id, job);
+  renderAdminMain();
+}
+async function deleteJob(id){
+  if(!confirm('Delete this posting? This cannot be undone.')) return;
+  await sdel('jobs:'+id);
+  renderAdminMain();
+}
+async function openJobModal(jobId){
+  let job = null;
+  if(jobId) job = await sget('jobs:'+jobId);
+  jobModalDraft = jobId || null;
+  document.getElementById('modal-root').innerHTML = `
+    <div class="overlay" onclick="if(event.target===this) closeModal()">
+      <div class="modal">
+        <h3>${job ? 'Edit posting' : 'New posting'}</h3>
+        <div class="sub">${job ? job.code : 'A code is assigned on save'}</div>
+        <label>Job title</label>
+        <input type="text" id="jm-title" value="${job?escapeHtml(job.title):''}">
+        <label>Company</label>
+        <input type="text" id="jm-company" value="${job?escapeHtml(job.company):''}">
+        <label>Location</label>
+        <input type="text" id="jm-location" value="${job?escapeHtml(job.location):''}">
+        <label>Type</label>
+        <select id="jm-type">
+          ${['Full-time','Part-time','Contract','Internship'].map(t=>`<option ${job&&job.type===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+        <label>Salary (optional)</label>
+        <input type="text" id="jm-salary" value="${job?escapeHtml(job.salary||''):''}">
+        <label>Description</label>
+        <textarea id="jm-desc" rows="5">${job?escapeHtml(job.description):''}</textarea>
+        <div class="modal-actions">
+          <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-gold" onclick="saveJobModal()">${job?'Save changes':'Publish posting'}</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+async function saveJobModal(){
+  const title = document.getElementById('jm-title').value.trim();
+  const company = document.getElementById('jm-company').value.trim();
+  const location = document.getElementById('jm-location').value.trim();
+  const type = document.getElementById('jm-type').value;
+  const salary = document.getElementById('jm-salary').value.trim();
+  const description = document.getElementById('jm-desc').value.trim();
+  if(!title || !company || !location || !description){ alert('Fill in title, company, location, and description.'); return; }
+  if(jobModalDraft){
+    const job = await sget('jobs:'+jobModalDraft);
+    Object.assign(job, {title, company, location, type, salary, description});
+    await sset('jobs:'+jobModalDraft, job);
+  } else {
+    await createJob({title, company, location, type, salary, description});
+  }
+  closeModal();
+  renderAdminMain();
+}
+
+async function renderAdminApplications(main){
+  const apps = await getAllApplications();
+  main.innerHTML = `
+    <div class="page-head">
+      <div><div class="eyebrow">Pipeline</div><h2>Applications</h2></div>
+    </div>
+    <div id="admin-apps"></div>
+  `;
+  const wrap = document.getElementById('admin-apps');
+  if(apps.length===0){
+    wrap.innerHTML = `<div class="empty"><div class="display">No applications yet</div>Applications from job seekers will land here.</div>`;
+    return;
+  }
+  wrap.innerHTML = apps.map(a => `
+    <div class="app-row">
+      <div class="left">
+        <h4>${escapeHtml(a.jobTitle)} ${a.company?'· '+escapeHtml(a.company):''}</h4>
+        <div class="sub">${a.refCode} · ${escapeHtml(a.name)} (@${escapeHtml(a.username)}) · ${a.type==='apply_for_me'?'Apply For Me':'Direct'} · ${timeAgo(a.createdAt)}</div>
+        ${a.note ? `<div style="font-size:12.5px; color:var(--ink-70); margin-top:6px; max-width:520px;">${escapeHtml(a.note)}</div>` : ''}
+      </div>
+      <div class="right">
+        <select class="status-sel" onchange="changeAppStatus('${a.id}', this.value)">
+          ${['submitted','reviewing','interview','hired','rejected'].map(s=>`<option value="${s}" ${a.status===s?'selected':''}>${statusLabel(s)}</option>`).join('')}
+        </select>
+        <button class="btn btn-outline" onclick="goMessageApplicant('${a.username}')">Message</button>
+      </div>
+    </div>
+  `).join('');
+}
+async function changeAppStatus(id, status){
+  await updateApplicationStatus(id, status);
+}
+function goMessageApplicant(username){
+  currentAdminSection = 'messages';
+  activeThreadUser = username;
+  renderAdminMain();
+}
+
+async function renderAdminMessages(main){
+  const clients = await getAllClientUsernamesWithActivity();
+  // also include anyone with a message thread even if role lookup odd
+  const threadData = await Promise.all(clients.map(async c => ({user:c, thread: await getThread(c.username)})));
+  threadData.sort((a,b)=>{
+    const at = a.thread.length ? a.thread[a.thread.length-1].ts : 0;
+    const bt = b.thread.length ? b.thread[b.thread.length-1].ts : 0;
+    return bt-at;
+  });
+  if(!activeThreadUser && threadData.length){
+    activeThreadUser = threadData[0].user.username;
+  }
+  main.innerHTML = `
+    <div class="page-head">
+      <div><div class="eyebrow">Inbox</div><h2>Messages</h2></div>
+    </div>
+    <div class="msg-layout">
+      <div class="thread-list" id="thread-list"></div>
+      <div class="chat-col">
+        <div class="chat-head" id="chat-head">Select a conversation</div>
+        <div class="chat-scroll" id="chat-scroll"></div>
+        <div class="chat-input">
+          <textarea id="chat-input-box" placeholder="Write a reply..."></textarea>
+          <button class="btn btn-dark" onclick="adminSend()">Send</button>
+        </div>
+      </div>
+    </div>
+  `;
+  const list = document.getElementById('thread-list');
+  if(threadData.length===0){
+    list.innerHTML = `<div class="empty" style="margin:14px;">No conversations yet.</div>`;
+  } else {
+    list.innerHTML = threadData.map(td => {
+      const last = td.thread.length ? td.thread[td.thread.length-1] : null;
+      const needsReply = last && last.from === 'client';
+      return `
+      <button class="thread-item ${td.user.username===activeThreadUser?'active':''}" onclick="selectAdminThread('${td.user.username}')">
+        <div class="tname">${escapeHtml(td.user.name)} ${needsReply?'<span class=\"side-badge\">new</span>':''}</div>
+        <div class="tprev">${last ? escapeHtml(last.text) : 'No messages yet'}</div>
+      </button>`;
+    }).join('');
+  }
+  renderAdminChatPane();
+}
+function selectAdminThread(username){
+  activeThreadUser = username;
+  renderAdminMessages(document.getElementById('main'));
+}
+async function renderAdminChatPane(){
+  if(!activeThreadUser) return;
+  const users = await sget('users:'+activeThreadUser);
+  document.getElementById('chat-head').textContent = users ? users.name : activeThreadUser;
+  const thread = await getThread(activeThreadUser);
+  const scroll = document.getElementById('chat-scroll');
+  if(!scroll) return;
+  if(thread.length===0){
+    scroll.innerHTML = `<div class="empty">No messages yet in this thread.</div>`;
+  } else {
+    scroll.innerHTML = thread.map(m => `
+      <div class="bubble ${m.from==='admin'?'mine':'theirs'}">
+        ${escapeHtml(m.text)}
+        <div class="t">${m.from==='admin'?'You':'Applicant'} · ${timeAgo(m.ts)}</div>
+      </div>
+    `).join('');
+    scroll.scrollTop = scroll.scrollHeight;
+  }
+}
+async function adminSend(){
+  if(!activeThreadUser) return;
+  const box = document.getElementById('chat-input-box');
+  const text = box.value.trim();
+  if(!text) return;
+  box.value='';
+  await sendMessage(activeThreadUser, 'admin', text);
+  renderAdminChatPane();
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+init();
+</script>
+</body>
+</html>
