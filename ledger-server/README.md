@@ -131,11 +131,13 @@ correct.
    wherever this folder ends up on your account), then run `npm install` and
    start the app. Check the logs for `Connected to the database.` to confirm
    it worked.
-6. **Point the front-end at it.** In `login.html`, `messages.html`, and
-   `admin.html`, change the API base URL near the top of each `<script>`
-   block from `http://localhost:4000/...` to your deployed server's real
-   URL, e.g. `https://your-app.hostinger.app/api/...`. Re-upload those three
-   files to wherever the static site is served from.
+6. **The site and the API are served by this one app.** `server.js` serves
+   the static `PrimeSphere` pages (`index.html`, `jobs.html`, etc. — the
+   folder one level above `ledger-server/`) as well as the `/api/*` routes,
+   so your Hostinger domain serves everything from this single Node app —
+   no separate static hosting needed. `login.html`, `messages.html`, and
+   `admin.html` already call the API with relative paths (`/api/...`), so
+   they work as-is on whatever domain the app ends up on.
 
 ## Security notes for a production version
 

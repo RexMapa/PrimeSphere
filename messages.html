@@ -100,7 +100,9 @@
 
 <script>
 // Point this at your deployed ledger-server (see the README in that project).
-const API_BASE = 'http://localhost:4000/api';
+// Relative path — works whether you're testing locally (server.js serves
+// both the site and /api/*) or on your deployed Hostinger domain.
+const API_BASE = '/api';
 
 (function(){
   const threadEl = document.getElementById('chatThread');

@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const db = require('./db');
@@ -25,6 +26,13 @@ app.get('/health', (req, res) => res.json({ ok: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/messages', createMessagesRouter(requireAuth, requireAdmin));
 
+// Serve the static PrimeSphere site (index.html, jobs.html, css/, js/, etc.)
+// which lives one directory up from this ledger-server folder. This makes
+// the same Node app answer both the site itself and the /api/* routes, so
+// Hostinger only needs the one app to serve the whole domain.
+const SITE_ROOT = path.join(__dirname, '..', '..');
+app.use(express.static(SITE_ROOT));
+
 // Fallback error handler
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
@@ -33,13 +41,24 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 4000;
 
-// Create tables (if they don't already exist) before accepting traffic, so
-// a fresh database is ready to go without any manual SQL step.
+// Check the database connection before accepting traffic, but don't let a
+// bad/missing Supabase config take the whole site down — the static pages
+// should still load even if the API can't reach the database yet. API
+// routes that need the database will simply return their own 500 errors
+// (auth.js / messages.js already catch and report those individually).
 db.initDb()
   .then(() => {
+    console.log('Connected to the database.');
+  })
+  .catch(err => {
+    console.error('⚠️  Could not connect to the database:', err.message);
+    console.error('   Check SUPABASE_URL / SUPABASE_KEY, and make sure schema.sql');
+    console.error('   has been run in your Supabase project\'s SQL Editor.');
+    console.error('   The site will still serve static pages, but signup/login/messages will fail.');
+  })
+  .finally(() => {
     app.listen(PORT, () => {
-      console.log(`Ledger auth server listening on http://localhost:${PORT}`);
-      console.log('Connected to the database.');
+      console.log(`Ledger server listening on http://localhost:${PORT}`);
       if (!process.env.RESEND_API_KEY) {
         console.warn('⚠️  RESEND_API_KEY is not set — signup emails will fail to send.');
       }
@@ -50,10 +69,4 @@ db.initDb()
         console.warn('⚠️  ADMIN_EMAILS is not set — nobody will have admin access to the message inbox.');
       }
     });
-  })
-  .catch(err => {
-    console.error('❌ Could not connect to the database:', err.message);
-    console.error('   Check SUPABASE_URL / SUPABASE_KEY in your .env file, and make sure');
-    console.error('   schema.sql has been run in your Supabase project\'s SQL Editor.');
-    process.exit(1);
   });
