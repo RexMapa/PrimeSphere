@@ -76,12 +76,12 @@ router.post('/signup/start', startLimiter, async (req, res) => {
     if (!isValidEmail(email)) return res.status(400).json({ error: 'Enter a valid email address.' });
     if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters.' });
 
-    const existing = db.findAccountByEmail(email);
+    const existing = await db.findAccountByEmail(email);
     if (existing) {
       return res.status(409).json({ error: 'An account with that email already exists. Log in instead.' });
     }
 
-    const pending = db.getPending(email);
+    const pending = await db.getPending(email);
     if (pending && Date.now() - pending.lastSentAt < RESEND_COOLDOWN_MS) {
       const waitSec = Math.ceil((RESEND_COOLDOWN_MS - (Date.now() - pending.lastSentAt)) / 1000);
       return res.status(429).json({ error: `Please wait ${waitSec}s before requesting another code.` });
@@ -92,7 +92,7 @@ router.post('/signup/start', startLimiter, async (req, res) => {
 
     await sendVerificationEmail(email, code);
 
-    db.upsertPending({
+    await db.upsertPending({
       email,
       name,
       passwordHash,
@@ -116,7 +116,7 @@ router.post('/signup/start', startLimiter, async (req, res) => {
 router.post('/signup/resend', startLimiter, async (req, res) => {
   try {
     const email = String(req.body.email || '').trim().toLowerCase();
-    const pending = db.getPending(email);
+    const pending = await db.getPending(email);
     if (!pending) return res.status(404).json({ error: 'No pending signup for that email. Start again.' });
 
     if (Date.now() - pending.lastSentAt < RESEND_COOLDOWN_MS) {
@@ -127,7 +127,7 @@ router.post('/signup/resend', startLimiter, async (req, res) => {
     const code = generateCode();
     await sendVerificationEmail(email, code);
 
-    db.upsertPending({
+    await db.upsertPending({
       ...pending,
       code,
       attempts: 0,
@@ -154,31 +154,31 @@ router.post('/signup/verify', verifyLimiter, async (req, res) => {
     const email = String(req.body.email || '').trim().toLowerCase();
     const code = String(req.body.code || '').trim();
 
-    const pending = db.getPending(email);
+    const pending = await db.getPending(email);
     if (!pending) return res.status(404).json({ error: 'No pending signup for that email. Start again.' });
 
     if (Date.now() > pending.expiresAt) {
-      db.deletePending(email);
+      await db.deletePending(email);
       return res.status(410).json({ error: 'That code expired. Request a new one.' });
     }
 
     if (pending.attempts >= MAX_ATTEMPTS) {
-      db.deletePending(email);
+      await db.deletePending(email);
       return res.status(429).json({ error: 'Too many incorrect attempts. Start signup again.' });
     }
 
     if (code !== pending.code) {
-      db.upsertPending({ ...pending, attempts: pending.attempts + 1 });
+      await db.upsertPending({ ...pending, attempts: pending.attempts + 1 });
       return res.status(400).json({ error: 'Incorrect code. Check your email and try again.' });
     }
 
-    const account = db.createAccount({
+    const account = await db.createAccount({
       name: pending.name,
       email: pending.email,
       passwordHash: pending.passwordHash,
       role: isAdminEmail(pending.email) ? 'admin' : 'jobseeker',
     });
-    db.deletePending(email);
+    await db.deletePending(email);
 
     const token = signToken(account);
     return res.json({ token, account: publicAccount(account) });
@@ -197,7 +197,7 @@ router.post('/login', loginLimiter, async (req, res) => {
     const email = String(req.body.email || '').trim().toLowerCase();
     const password = String(req.body.password || '');
 
-    const account = db.findAccountByEmail(email);
+    const account = await db.findAccountByEmail(email);
     if (!account) return res.status(401).json({ error: 'Incorrect email or password.' });
 
     const ok = await bcrypt.compare(password, account.passwordHash);
@@ -207,7 +207,7 @@ router.post('/login', loginLimiter, async (req, res) => {
     // account was created (e.g. an existing account was just made an admin).
     const effectiveRole = isAdminEmail(account.email) ? 'admin' : (account.role || 'jobseeker');
     if (effectiveRole !== account.role) {
-      db.updateAccountRole(account.id, effectiveRole);
+      await db.updateAccountRole(account.id, effectiveRole);
       account.role = effectiveRole;
     }
 
@@ -223,14 +223,14 @@ router.post('/login', loginLimiter, async (req, res) => {
  * GET /api/auth/me
  * header: Authorization: Bearer <token>
  */
-router.get('/me', (req, res) => {
+router.get('/me', async (req, res) => {
   const authHeader = req.headers.authorization || '';
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
   if (!token) return res.status(401).json({ error: 'Not authenticated.' });
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    const account = db.findAccountByEmail(payload.email);
+    const account = await db.findAccountByEmail(payload.email);
     if (!account) return res.status(401).json({ error: 'Account no longer exists.' });
     return res.json({ account: publicAccount(account) });
   } catch (err) {

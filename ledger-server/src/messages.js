@@ -36,56 +36,81 @@ module.exports = function createMessagesRouter(requireAuth, requireAdmin) {
 
   // ---------------- jobseeker side ----------------
 
-  router.get('/mine', requireAuth, (req, res) => {
-    const account = { id: req.account.sub, name: req.account.name, email: req.account.email };
-    const conv = db.ensureConversation(account);
-    db.markRead(account.id, 'user');
-    return res.json({ conversation: serializeConversation(conv) });
+  router.get('/mine', requireAuth, async (req, res) => {
+    try {
+      const account = { id: req.account.sub, name: req.account.name, email: req.account.email };
+      const conv = await db.ensureConversation(account);
+      await db.markRead(account.id, 'user');
+      return res.json({ conversation: serializeConversation(conv) });
+    } catch (err) {
+      console.error('GET /messages/mine error:', err);
+      return res.status(500).json({ error: 'Could not load conversation.' });
+    }
   });
 
-  router.post('/', requireAuth, (req, res) => {
-    const text = String((req.body && req.body.text) || '').trim();
-    if (!text) return res.status(400).json({ error: 'Message cannot be empty.' });
-    if (text.length > MAX_LEN) return res.status(400).json({ error: 'Message is too long.' });
+  router.post('/', requireAuth, async (req, res) => {
+    try {
+      const text = String((req.body && req.body.text) || '').trim();
+      if (!text) return res.status(400).json({ error: 'Message cannot be empty.' });
+      if (text.length > MAX_LEN) return res.status(400).json({ error: 'Message is too long.' });
 
-    const account = { id: req.account.sub, name: req.account.name, email: req.account.email };
-    const msg = db.addMessage(account.id, account, 'user', text);
-    return res.json({ message: msg });
+      const account = { id: req.account.sub, name: req.account.name, email: req.account.email };
+      const msg = await db.addMessage(account.id, account, 'user', text);
+      return res.json({ message: msg });
+    } catch (err) {
+      console.error('POST /messages error:', err);
+      return res.status(500).json({ error: 'Could not send message.' });
+    }
   });
 
   // ---------------- admin side ----------------
 
-  router.get('/conversations', requireAdmin, (req, res) => {
-    const list = db.listConversations().map(c => ({
-      accountId: c.accountId,
-      name: c.name,
-      email: c.email,
-      lastMessage: c.messages.length ? c.messages[c.messages.length - 1] : null,
-      unreadForAdmin: c.unreadForAdmin || 0,
-      updatedAt: c.updatedAt,
-    }));
-    return res.json({ conversations: list });
-  });
-
-  router.get('/conversations/:accountId', requireAdmin, (req, res) => {
-    const conv = db.getConversation(req.params.accountId);
-    if (!conv) return res.status(404).json({ error: 'Conversation not found.' });
-    db.markRead(req.params.accountId, 'admin');
-    return res.json({ conversation: serializeConversation(conv) });
-  });
-
-  router.post('/conversations/:accountId/reply', requireAdmin, (req, res) => {
-    const text = String((req.body && req.body.text) || '').trim();
-    if (!text) return res.status(400).json({ error: 'Message cannot be empty.' });
-    if (text.length > MAX_LEN) return res.status(400).json({ error: 'Message is too long.' });
-
-    const conv = db.getConversation(req.params.accountId);
-    if (!conv) {
-      return res.status(404).json({ error: 'Conversation not found. The jobseeker must message in first.' });
+  router.get('/conversations', requireAdmin, async (req, res) => {
+    try {
+      const list = (await db.listConversations()).map(c => ({
+        accountId: c.accountId,
+        name: c.name,
+        email: c.email,
+        lastMessage: c.messages.length ? c.messages[c.messages.length - 1] : null,
+        unreadForAdmin: c.unreadForAdmin || 0,
+        updatedAt: c.updatedAt,
+      }));
+      return res.json({ conversations: list });
+    } catch (err) {
+      console.error('GET /messages/conversations error:', err);
+      return res.status(500).json({ error: 'Could not load conversations.' });
     }
+  });
 
-    const msg = db.addMessage(req.params.accountId, { name: conv.name, email: conv.email }, 'admin', text);
-    return res.json({ message: msg });
+  router.get('/conversations/:accountId', requireAdmin, async (req, res) => {
+    try {
+      const conv = await db.getConversation(req.params.accountId);
+      if (!conv) return res.status(404).json({ error: 'Conversation not found.' });
+      await db.markRead(req.params.accountId, 'admin');
+      return res.json({ conversation: serializeConversation(conv) });
+    } catch (err) {
+      console.error('GET /messages/conversations/:accountId error:', err);
+      return res.status(500).json({ error: 'Could not load conversation.' });
+    }
+  });
+
+  router.post('/conversations/:accountId/reply', requireAdmin, async (req, res) => {
+    try {
+      const text = String((req.body && req.body.text) || '').trim();
+      if (!text) return res.status(400).json({ error: 'Message cannot be empty.' });
+      if (text.length > MAX_LEN) return res.status(400).json({ error: 'Message is too long.' });
+
+      const conv = await db.getConversation(req.params.accountId);
+      if (!conv) {
+        return res.status(404).json({ error: 'Conversation not found. The jobseeker must message in first.' });
+      }
+
+      const msg = await db.addMessage(req.params.accountId, { name: conv.name, email: conv.email }, 'admin', text);
+      return res.json({ message: msg });
+    } catch (err) {
+      console.error('POST /messages/conversations/:accountId/reply error:', err);
+      return res.status(500).json({ error: 'Could not send reply.' });
+    }
   });
 
   return router;

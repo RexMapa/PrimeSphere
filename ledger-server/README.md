@@ -2,9 +2,12 @@
 
 A small, real backend that verifies a person's email address *before*
 creating their account — as opposed to the front-end-only simulation in the
-static `Ledger` site, this one actually sends a code to their inbox via
+static `PrimeSphere` site, this one actually sends a code to their inbox via
 [Resend](https://resend.com) and won't create the account until that code is
-confirmed.
+confirmed. All data (accounts, pending signups, and messages) is stored in a
+**Supabase (Postgres) database**, not a JSON file — so it survives restarts
+and redeploys, and it's the database Hostinger's own "Connect Database ->
+Supabase" flow wires up for a Node.js app.
 
 ## How it works
 
@@ -25,8 +28,8 @@ confirmed.
    `Authorization: Bearer <token>` header.
 
 No account row is ever written until step 2 succeeds — that's the actual
-"verify before creating" behavior you asked for. The front-end demo can't do
-this on its own because it has no server to send real email from.
+"verify before creating" behavior. The front-end demo can't do this on its
+own because it has no server to send real email from.
 
 ## Messaging (jobseeker ↔ admin)
 
@@ -46,17 +49,30 @@ Every jobseeker account gets one chat thread with the site admin. Endpoints
 An account becomes an admin when its email is listed in `ADMIN_EMAILS` (see
 below) — that's checked on every login/signup, so adding an email there and
 logging in (or signing up) is all it takes. Admin-only routes return `403`
-for anyone else. Threads live in the same `data/db.json` file as accounts, so
-they'll need the same real-database swap mentioned below before production
-use.
+for anyone else.
 
-The front-end talks to this from **`messages.html`** (jobseeker chat) and
-**`admin.html`** (admin inbox) — both poll every few seconds for new
-messages rather than using websockets, to keep the server dependency-free.
+## The database
 
-## Setup
+Four tables in Supabase: `accounts`, `pending_verifications`,
+`conversations`, `messages`. Unlike a plain SQL driver, the `supabase-js`
+client (`src/db.js`) only reads and writes rows — it can't create tables —
+so **you need to run `schema.sql` once** before first use:
 
-Requires Node 18+.
+1. Open your project at [supabase.com](https://supabase.com) (or the one
+   Hostinger created for you).
+2. Go to **SQL Editor -> New query**.
+3. Paste the entire contents of `schema.sql` and click **Run**.
+
+That file also disables Row Level Security on all four tables. This app
+does its own authentication (bcrypt + JWT) rather than Supabase Auth, so RLS
+needs to be off — otherwise Supabase's default policies silently block every
+read/write this server makes. `initDb()` checks on startup that the
+`accounts` table is reachable and gives a clear error if it isn't (wrong
+keys, or `schema.sql` not run yet).
+
+## Setup (local development)
+
+Requires Node 18+ and a Supabase project (free tier is enough).
 
 ```bash
 npm install
@@ -65,6 +81,11 @@ cp .env.example .env
 
 Then fill in `.env`:
 
+- **`SUPABASE_URL`** / **`SUPABASE_KEY`** — from your Supabase project:
+  **Project Settings -> API**. Use the **`service_role`** key, not the
+  public `anon` key — this is a trusted backend and RLS is off, so the
+  service_role key is what lets it read/write freely. Never expose the
+  service_role key to a browser/front-end.
 - **`RESEND_API_KEY`** — sign up at resend.com (free tier is fine), verify a
   sending domain (or use their `onboarding@resend.dev` sandbox sender while
   testing), then create an API key.
@@ -85,34 +106,36 @@ npm run dev     # auto-restarts on file changes
 npm start
 ```
 
-It listens on `http://localhost:4000` by default (`PORT` in `.env`).
+It listens on `http://localhost:4000` by default (`PORT` in `.env`). If it
+can't reach the `accounts` table, it logs a clear error and exits — check
+that `schema.sql` has been run and that `SUPABASE_URL` / `SUPABASE_KEY` are
+correct.
 
-## Deploying
+## Deploying on Hostinger
 
-This is a plain Express app — deploy it anywhere that runs Node:
-**Render, Railway, Fly.io, a VPS, etc.** A few notes:
-
-- Set the same environment variables from `.env` in your host's dashboard.
-- The data store is a JSON file (`data/db.json`) for simplicity — it's fine
-  for a demo or low-traffic use, but **swap `src/db.js` for a real database**
-  (Postgres, MySQL, etc.) before relying on this in production, since a flat
-  file won't survive most platforms' ephemeral filesystems or handle
-  concurrent writes safely.
-- Update `CORS_ORIGIN` to your deployed front-end's real URL once you know it.
-
-## Wiring up the front-end
-
-In `login.html`, set `AUTH_API_BASE` (near the top of the `<script>` block)
-to wherever you deploy this server, e.g.:
-
-```js
-const AUTH_API_BASE = 'https://your-server.onrender.com/api/auth';
-```
-
-The updated `login.html` I gave you already calls these endpoints instead of
-generating a fake local code — it posts to `/signup/start`, shows the "check
-your email" screen, and posts the entered code to `/signup/verify` to
-actually create the account.
+1. **Run `schema.sql`** in your Supabase project's SQL Editor (see above) —
+   do this before the app's first boot.
+2. **Upload / clone this repo** onto your Hostinger Node.js hosting (via Git
+   deployment or the file manager).
+3. In the Node.js app dashboard, under **Essentials -> Database**, click
+   **Connect**, choose **Supabase**, sign in, and either connect your
+   existing project or create a new one. Hostinger automatically adds
+   `SUPABASE_URL` and `SUPABASE_KEY` (or similarly named variables — check
+   the app's **Environment variables** tab and rename in `.env`/`db.js` if
+   Hostinger used different names) to your app's environment and redeploys.
+4. Add the rest of the variables from `.env.example` in that same
+   **Environment variables** panel: `JWT_SECRET`, `RESEND_API_KEY`,
+   `EMAIL_FROM`, `ADMIN_EMAILS`, and `CORS_ORIGIN` set to the URL where the
+   static `PrimeSphere` site itself is hosted.
+5. Set **Startup file** to `ledger-server/src/server.js` (adjust the path to
+   wherever this folder ends up on your account), then run `npm install` and
+   start the app. Check the logs for `Connected to the database.` to confirm
+   it worked.
+6. **Point the front-end at it.** In `login.html`, `messages.html`, and
+   `admin.html`, change the API base URL near the top of each `<script>`
+   block from `http://localhost:4000/...` to your deployed server's real
+   URL, e.g. `https://your-app.hostinger.app/api/...`. Re-upload those three
+   files to wherever the static site is served from.
 
 ## Security notes for a production version
 
@@ -121,6 +144,8 @@ actually create the account.
   `CODE_MAX_ATTEMPTS` wrong guesses before requiring a fresh code.
 - Resending is rate-limited (`CODE_RESEND_COOLDOWN_SECONDS`) and the signup/
   login endpoints have basic IP rate limiting via `express-rate-limit`.
+- `.env` is gitignored — never commit real secrets to the repo, and never
+  put the `service_role` key anywhere a browser can read it. Use your host's
+  environment-variable panel for production values.
 - Consider adding: HTTPS (required in production — most hosts provide this
-  automatically), a real database with proper indexing/uniqueness
-  constraints on email, logging/alerting, and a password reset flow.
+  automatically), logging/alerting, and a password reset flow.
