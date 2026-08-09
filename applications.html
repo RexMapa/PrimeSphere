@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My applications — Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="index.html" class="logo"><span class="logo-mark">L</span>Ledger</a>
+    <nav class="nav-links" id="navLinks">
+      <a href="jobs.html">Browse jobs</a>
+      <a href="companies.html">Companies</a>
+      <a href="applications.html">My applications</a>
+      <a href="messages.html">Messages</a>
+      <a href="advice.html">Advice</a>
+    </nav>
+    <div class="nav-right">
+      <a href="login.html" id="loginLink" data-login-link>Log in</a>
+      <a href="post-job.html" class="btn btn-solid">Post a job</a>
+      <button type="button" class="menu-toggle" id="menuToggle" aria-label="Toggle menu" aria-expanded="false"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="wrap">
+    <span class="eyebrow">Filed from this browser</span>
+    <h1>My applications</h1>
+    <p>Every role you've applied to from this device, with live status.</p>
+  </div>
+</section>
+<section class="section wrap" style="padding-top:0; max-width:720px;">
+  <div id="trackList"></div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap">
+    <div class="cta-band-inner">
+      <h2>Ready to file your next role?</h2>
+      <p>It takes four minutes to build a profile. It takes one click to apply.</p>
+      <a href="login.html" class="btn btn-rust">Create your file</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo"><span class="logo-mark">L</span>Ledger</div>
+        <p>A job board that files every listing like it matters — because someone's next paycheck depends on it.</p>
+      </div>
+      <div>
+        <h4>For applicants</h4>
+        <ul>
+          <li><a href="jobs.html">Browse jobs</a></li>
+          <li><a href="applications.html">My applications</a></li>
+          <li><a href="advice.html">Career advice</a></li>
+          <li><a href="advice.html">Salary guide</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>For companies</h4>
+        <ul>
+          <li><a href="post-job.html">Post a job</a></li>
+          <li><a href="companies.html">Companies hiring</a></li>
+          <li><a href="login.html">Employer login</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Ledger</h4>
+        <ul>
+          <li><a href="index.html">About</a></li>
+          <li><a href="advice.html">Contact</a></li>
+          <li><a href="index.html">Privacy</a></li>
+          <li><a href="admin.html">Admin</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Ledger Job Co.</span>
+      <span>Filed in Austin, TX</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="ldgToast"></div>
+<script src="js/app.js"></script>
+
+<script>
+(async function(){
+  const mine = (await Ledger.dbGet('my-applications', false)) || [];
+  const list = document.getElementById('trackList');
+  if(!mine.length){
+    list.innerHTML = '<div class="empty-track">No applications filed yet from this browser. <a href="jobs.html" style="color:var(--rust);">Browse open roles →</a></div>';
+  } else {
+    list.innerHTML = mine.map(a => `
+      <div class="app-track-item">
+        <h4>${Ledger.escapeHtml(a.jobTitle)}</h4>
+        <div style="color:var(--ink-soft); font-size:12.5px;">${Ledger.escapeHtml(a.company)}</div>
+        <div class="meta"><span class="status">${Ledger.escapeHtml(a.status)}</span><span>${new Date(a.appliedAt).toLocaleDateString()}</span></div>
+      </div>`).join('');
+  }
+})();
+</script>
+
+</body>
+</html>

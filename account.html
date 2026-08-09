@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your account — Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="index.html" class="logo"><span class="logo-mark">L</span>Ledger</a>
+    <nav class="nav-links" id="navLinks">
+      <a href="jobs.html">Browse jobs</a>
+      <a href="companies.html">Companies</a>
+      <a href="applications.html">My applications</a>
+      <a href="messages.html">Messages</a>
+      <a href="advice.html">Advice</a>
+    </nav>
+    <div class="nav-right">
+      <a href="login.html" id="loginLink" data-login-link>Log in</a>
+      <a href="post-job.html" class="btn btn-solid">Post a job</a>
+      <button type="button" class="menu-toggle" id="menuToggle" aria-label="Toggle menu" aria-expanded="false"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="wrap">
+    <span class="eyebrow">Your file</span>
+    <h1 id="acctHeading">Account</h1>
+    <p>Manage the details Ledger uses to speed up your applications.</p>
+  </div>
+</section>
+<section class="section wrap" style="padding-top:0;" id="acctSection">
+  <div class="account-grid">
+    <div class="account-panel">
+      <div class="account-avatar" id="acctAvatar">?</div>
+      <h3 id="acctName">—</h3>
+      <p style="color:var(--ink-soft); font-size:13.5px; margin-bottom:4px;" id="acctContact">—</p>
+      <p style="color:var(--ink-soft); font-size:12px; margin-bottom:20px; display:none;" id="acctVerified">✓ Email verified</p>
+      <a href="applications.html" class="btn" style="margin-right:10px;">View my applications</a>
+      <a href="#" class="btn" id="logoutBtn">Log out</a>
+    </div>
+    <div class="account-panel">
+      <h3>Edit your file</h3>
+      <form id="editForm">
+        <div class="field"><label for="eName">Full name</label><input type="text" id="eName" required></div>
+        <div class="field"><label for="eContact">Email or phone number</label><input type="text" id="eContact" required></div>
+        <div class="field"><label for="ePassword">Password</label><input type="password" id="ePassword" placeholder="••••••••" required></div>
+        <div class="modal-error" id="editError">Please fill in your name, an email or phone number, and a password.</div>
+        <button type="submit" class="btn btn-rust" style="width:100%; padding:14px;">Save changes</button>
+      </form>
+    </div>
+  </div>
+</section>
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo"><span class="logo-mark">L</span>Ledger</div>
+        <p>A job board that files every listing like it matters — because someone's next paycheck depends on it.</p>
+      </div>
+      <div>
+        <h4>For applicants</h4>
+        <ul>
+          <li><a href="jobs.html">Browse jobs</a></li>
+          <li><a href="applications.html">My applications</a></li>
+          <li><a href="advice.html">Career advice</a></li>
+          <li><a href="advice.html">Salary guide</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>For companies</h4>
+        <ul>
+          <li><a href="post-job.html">Post a job</a></li>
+          <li><a href="companies.html">Companies hiring</a></li>
+          <li><a href="login.html">Employer login</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Ledger</h4>
+        <ul>
+          <li><a href="index.html">About</a></li>
+          <li><a href="advice.html">Contact</a></li>
+          <li><a href="index.html">Privacy</a></li>
+          <li><a href="admin.html">Admin</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Ledger Job Co.</span>
+      <span>Filed in Austin, TX</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="ldgToast"></div>
+<script src="js/app.js"></script>
+
+<script>
+(async function(){
+  const profile = await Ledger.getProfile();
+  if(!profile){ location.href = 'login.html?redirect=account.html'; return; }
+  document.getElementById('acctHeading').textContent = 'Hi, ' + profile.name.split(' ')[0];
+  document.getElementById('acctAvatar').textContent = profile.name.charAt(0).toUpperCase();
+  document.getElementById('acctName').textContent = profile.name;
+  document.getElementById('acctContact').textContent = profile.contact || '';
+  if(profile.verified){ document.getElementById('acctVerified').style.display = ''; }
+  document.getElementById('eName').value = profile.name;
+  document.getElementById('eContact').value = profile.contact || '';
+  document.getElementById('ePassword').value = profile.password || '';
+
+  document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+    e.preventDefault();
+    await Ledger.clearProfile();
+    Ledger.showToast('Logged out on this device.');
+    setTimeout(() => location.href = 'index.html', 500);
+  });
+
+  document.getElementById('editForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('eName').value.trim();
+    const contact = document.getElementById('eContact').value.trim();
+    const password = document.getElementById('ePassword').value;
+    const contactOk = /\S+@\S+\.\S+/.test(contact) || /^[\d()+\-.\s]{7,}$/.test(contact);
+    if(!name || !contactOk || password.length < 4){ document.getElementById('editError').classList.add('show'); return; }
+    document.getElementById('editError').classList.remove('show');
+    await Ledger.setProfile({name, contact, password});
+    Ledger.showToast('Your file was updated.');
+    location.reload();
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Browse jobs — Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="index.html" class="logo"><span class="logo-mark">L</span>Ledger</a>
+    <nav class="nav-links" id="navLinks">
+      <a href="jobs.html">Browse jobs</a>
+      <a href="companies.html">Companies</a>
+      <a href="applications.html">My applications</a>
+      <a href="messages.html">Messages</a>
+      <a href="advice.html">Advice</a>
+    </nav>
+    <div class="nav-right">
+      <a href="login.html" id="loginLink" data-login-link>Log in</a>
+      <a href="post-job.html" class="btn btn-solid">Post a job</a>
+      <button type="button" class="menu-toggle" id="menuToggle" aria-label="Toggle menu" aria-expanded="false"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="wrap">
+    <span class="eyebrow">Latest filings</span>
+    <h1>Browse open roles</h1>
+    <p>Search, filter, and sort every listing on Ledger. New postings go live the moment an employer files them.</p>
+  </div>
+</section>
+
+<section class="jobs-bg" id="jobsSection">
+  <div class="section wrap" style="padding-top:0;">
+
+    <div class="filters">
+      <div class="filter-dropdowns">
+        <div class="filter-dropdown" data-key="type" data-label="Employment type">
+          <button type="button" class="dd-trigger">
+            <span class="ico ico-employment">💼</span><span class="dd-label">Employment type</span><span class="chev">▾</span>
+          </button>
+          <div class="dropdown-panel">
+            <label><input type="checkbox" value="Full-time"> Full-time</label>
+            <label><input type="checkbox" value="Part-time"> Part-time</label>
+            <label><input type="checkbox" value="Contract"> Contract</label>
+            <div class="panel-clear">Clear</div>
+          </div>
+        </div>
+
+        <div class="filter-dropdown" data-key="loc" data-label="Location">
+          <button type="button" class="dd-trigger">
+            <span class="ico ico-social">📍</span><span class="dd-label">Location</span><span class="chev">▾</span>
+          </button>
+          <div class="dropdown-panel" id="locPanel">
+            <div class="panel-clear">Clear</div>
+          </div>
+        </div>
+
+        <div class="filter-dropdown" data-key="level" data-label="Experience">
+          <button type="button" class="dd-trigger">
+            <span class="ico ico-software">📈</span><span class="dd-label">Experience</span><span class="chev">▾</span>
+          </button>
+          <div class="dropdown-panel">
+            <label><input type="checkbox" value="Entry"> Entry</label>
+            <label><input type="checkbox" value="Mid"> Mid</label>
+            <label><input type="checkbox" value="Senior"> Senior</label>
+            <div class="panel-clear">Clear</div>
+          </div>
+        </div>
+
+        <div class="filter-dropdown" data-key="pay" data-label="Pay range">
+          <button type="button" class="dd-trigger">
+            <span class="ico ico-lang">💵</span><span class="dd-label">Pay range</span><span class="chev">▾</span>
+          </button>
+          <div class="dropdown-panel">
+            <label><input type="checkbox" value="under50"> Under $50k</label>
+            <label><input type="checkbox" value="mid"> $50k – $100k</label>
+            <label><input type="checkbox" value="high"> $100k+</label>
+            <div class="panel-clear">Clear</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-tags" id="deptTags">
+        <button type="button" class="filter-tag active" data-dept="all"><span class="emo">✳️</span>All roles</button>
+        <button type="button" class="filter-tag" data-dept="Design"><span class="emo">🎨</span>Design</button>
+        <button type="button" class="filter-tag" data-dept="Engineering"><span class="emo">💻</span>Engineering</button>
+        <button type="button" class="filter-tag" data-dept="Medical"><span class="emo">🩺</span>Medical</button>
+        <button type="button" class="filter-tag" data-dept="Trades"><span class="emo">🛠️</span>Trades</button>
+        <button type="button" class="filter-tag" data-dept="Hospitality"><span class="emo">🍽️</span>Hospitality</button>
+        <button type="button" class="filter-tag" data-dept="Creative"><span class="emo">📷</span>Creative</button>
+        <button type="button" class="filter-tag" data-dept="Marketing"><span class="emo">📣</span>Marketing</button>
+        <button type="button" class="filter-tag" data-dept="Sales"><span class="emo">💼</span>Sales</button>
+      </div>
+
+      <div class="sort-row">
+        <div class="filter-dropdown" id="sortPill" data-label="Newest">
+          <button type="button" class="dd-trigger sort-trigger">
+            Sort by <span class="dd-label"><b>Newest</b></span><span class="tag-new">LIVE</span><span class="chev">▾</span>
+          </button>
+          <div class="dropdown-panel">
+            <div class="sort-option" data-sort="newest">Newest</div>
+            <div class="sort-option" data-sort="pay">Highest pay</div>
+            <div class="sort-option" data-sort="company">Company A–Z</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="jobs-top">
+      <div class="section-head" style="margin-bottom:0;">
+        <span class="eyebrow">Results</span>
+        <h2>Open roles</h2>
+      </div>
+      <div class="results-line">
+        <span class="eyebrow">Showing <span id="resultsCount">0</span> of <span id="totalCount">0</span> roles below</span>
+        <button type="button" class="btn" id="clearAllBtn">Clear filters</button>
+      </div>
+    </div>
+
+    <div class="jobs-grid" id="jobsGrid"></div>
+
+    <div class="empty-state" id="emptyState">
+      <h3>No roles match those filters</h3>
+      <p>Try clearing a filter or broadening your search.</p>
+      <button type="button" class="btn btn-rust" id="emptyClearBtn">Clear all filters</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- Apply Modal -->
+<div class="modal-overlay" id="applyOverlay">
+  <div class="modal">
+    <button type="button" class="modal-close" data-close="applyOverlay">✕</button>
+    <h3 id="applyModalTitle">Apply for role</h3>
+    <div class="modal-sub" id="applyModalSub">Company · Location</div>
+    <form id="applyForm">
+      <div class="field"><label for="appName">Full name</label><input type="text" id="appName" placeholder="Jordan Reyes" required></div>
+      <div class="field"><label for="appEmail">Email</label><input type="email" id="appEmail" placeholder="you@email.com" required></div>
+      <div class="field"><label for="appPhone">Phone (optional)</label><input type="text" id="appPhone" placeholder="(555) 000-0000"></div>
+      <div class="field"><label for="appNote">Cover note</label><textarea id="appNote" placeholder="Why you're a fit for this role…"></textarea></div>
+      <div class="modal-error" id="applyError">Please fill in your name and a valid email.</div>
+      <label style="display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--ink-soft); margin-bottom:16px; cursor:pointer;">
+        <input type="checkbox" id="appSaveProfile" style="width:16px;height:16px;" checked> Save my info for faster applying next time
+      </label>
+      <button type="submit" class="btn btn-rust" style="width:100%; padding:15px;">Submit application</button>
+    </form>
+  </div>
+</div>
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo"><span class="logo-mark">L</span>Ledger</div>
+        <p>A job board that files every listing like it matters — because someone's next paycheck depends on it.</p>
+      </div>
+      <div>
+        <h4>For applicants</h4>
+        <ul>
+          <li><a href="jobs.html">Browse jobs</a></li>
+          <li><a href="applications.html">My applications</a></li>
+          <li><a href="advice.html">Career advice</a></li>
+          <li><a href="advice.html">Salary guide</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>For companies</h4>
+        <ul>
+          <li><a href="post-job.html">Post a job</a></li>
+          <li><a href="companies.html">Companies hiring</a></li>
+          <li><a href="login.html">Employer login</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Ledger</h4>
+        <ul>
+          <li><a href="index.html">About</a></li>
+          <li><a href="advice.html">Contact</a></li>
+          <li><a href="index.html">Privacy</a></li>
+          <li><a href="admin.html">Admin</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Ledger Job Co.</span>
+      <span>Filed in Austin, TX</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="ldgToast"></div>
+<script src="js/app.js"></script>
+
+<script>
+(async function(){
+  const state = { jobs: [], filters:{type:[],loc:[],level:[],pay:[]}, dept:'all', sort:'newest',
+                   search:{keyword:'',city:''}, activeJobId:null, profile:null };
+
+  const params = new URLSearchParams(location.search);
+  state.search.keyword = params.get('kw') || '';
+  state.search.city = params.get('city') || '';
+
+  state.jobs = await Ledger.loadJobs();
+  state.profile = await Ledger.getProfile();
+  document.getElementById('searchKeyword') ? null : null;
+
+  // populate location filter dynamically from data
+  const locs = [...new Set(state.jobs.map(j => j.loc))].sort();
+  document.getElementById('locPanel').insertAdjacentHTML('afterbegin',
+    locs.map(l => `<label><input type="checkbox" value="${Ledger.escapeHtml(l)}"> ${Ledger.escapeHtml(l)}</label>`).join(''));
+
+  document.getElementById('totalCount').textContent = state.jobs.length;
+
+  function filteredSortedJobs(){
+    let list = state.jobs.slice();
+    if(state.dept !== 'all') list = list.filter(j => j.dept === state.dept);
+    if(state.filters.type.length) list = list.filter(j => state.filters.type.includes(j.type));
+    if(state.filters.loc.length) list = list.filter(j => state.filters.loc.includes(j.loc));
+    if(state.filters.level.length) list = list.filter(j => state.filters.level.includes(j.level));
+    if(state.filters.pay.length){
+      list = list.filter(j => state.filters.pay.some(p => {
+        if(p==='under50') return j.paySort < 50;
+        if(p==='mid') return j.paySort >= 50 && j.paySort < 100;
+        if(p==='high') return j.paySort >= 100;
+        return true;
+      }));
+    }
+    const kw = state.search.keyword.trim().toLowerCase();
+    if(kw) list = list.filter(j => (j.title+' '+j.company+' '+j.dept).toLowerCase().includes(kw));
+    const city = state.search.city.trim().toLowerCase();
+    if(city) list = list.filter(j => j.loc.toLowerCase().includes(city));
+
+    if(state.sort==='pay') list.sort((a,b) => b.paySort - a.paySort);
+    else if(state.sort==='company') list.sort((a,b) => a.company.localeCompare(b.company));
+    else list.sort((a,b) => (b.createdAt||0)-(a.createdAt||0));
+    return list;
+  }
+
+  function render(){
+    const grid = document.getElementById('jobsGrid');
+    const list = filteredSortedJobs();
+    grid.innerHTML = list.map(j => `
+      <div class="job-card" data-job-id="${j.id}">
+        <div class="job-top"><span class="job-badge${j.badge==='Featured' ? ' featured':''}">${j.badge || 'Open'}</span></div>
+        <h3>${Ledger.escapeHtml(j.title)}</h3>
+        <div class="job-co">${Ledger.escapeHtml(j.company)} · ${Ledger.escapeHtml(j.dept)}</div>
+        <div class="job-meta">
+          <div><span>Location</span><span>${Ledger.escapeHtml(j.loc)}</span></div>
+          <div><span>Type</span><span>${Ledger.escapeHtml(j.type)}</span></div>
+          <div><span>Pay</span><span>${Ledger.escapeHtml(j.payDisplay)}</span></div>
+        </div>
+        <button type="button" class="job-apply" data-job-id="${j.id}">Apply now</button>
+      </div>`).join('');
+    document.getElementById('resultsCount').textContent = list.length;
+    document.getElementById('emptyState').style.display = list.length ? 'none' : 'block';
+  }
+  render();
+
+  // dropdowns
+  document.querySelectorAll('.filter-dropdown[data-key]').forEach(dd => {
+    const key = dd.getAttribute('data-key');
+    dd.querySelector('.dd-trigger').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const wasOpen = dd.classList.contains('open');
+      document.querySelectorAll('.filter-dropdown.open').forEach(o => o.classList.remove('open'));
+      if(!wasOpen) dd.classList.add('open');
+    });
+    dd.addEventListener('change', (e) => {
+      if(e.target.matches('input[type="checkbox"]')){
+        state.filters[key] = Array.from(dd.querySelectorAll('input[type="checkbox"]:checked')).map(i=>i.value);
+        render();
+      }
+    });
+    const clearEl = dd.querySelector('.panel-clear');
+    if(clearEl) clearEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dd.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked=false);
+      state.filters[key] = [];
+      render();
+    });
+  });
+  document.addEventListener('click', () => document.querySelectorAll('.filter-dropdown.open').forEach(o=>o.classList.remove('open')));
+
+  document.querySelectorAll('.filter-tag').forEach(tag => {
+    tag.addEventListener('click', () => {
+      document.querySelectorAll('.filter-tag').forEach(t=>t.classList.remove('active'));
+      tag.classList.add('active');
+      state.dept = tag.getAttribute('data-dept');
+      render();
+    });
+  });
+
+  document.querySelectorAll('#sortPill .sort-option').forEach(opt => {
+    opt.addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.sort = opt.getAttribute('data-sort');
+      document.querySelector('#sortPill .dd-label b').textContent = opt.textContent;
+      document.getElementById('sortPill').classList.remove('open');
+      render();
+    });
+  });
+
+  function clearAll(){
+    state.filters = {type:[],loc:[],level:[],pay:[]}; state.dept='all'; state.sort='newest'; state.search={keyword:'',city:''};
+    document.querySelectorAll('.dropdown-panel input[type="checkbox"]').forEach(cb=>cb.checked=false);
+    document.querySelectorAll('.filter-tag').forEach(t=>t.classList.toggle('active', t.getAttribute('data-dept')==='all'));
+    document.querySelector('#sortPill .dd-label b').textContent = 'Newest';
+    render();
+  }
+  document.getElementById('clearAllBtn').addEventListener('click', clearAll);
+  document.getElementById('emptyClearBtn').addEventListener('click', clearAll);
+
+  // apply modal
+  document.getElementById('jobsGrid').addEventListener('click', (e) => {
+    const btn = e.target.closest('.job-apply');
+    if(!btn) return;
+    const job = state.jobs.find(j => j.id === btn.getAttribute('data-job-id'));
+    if(!job) return;
+    state.activeJobId = job.id;
+    document.getElementById('applyModalTitle').textContent = 'Apply — ' + job.title;
+    document.getElementById('applyModalSub').textContent = job.company + ' · ' + job.loc;
+    document.getElementById('applyError').classList.remove('show');
+    if(state.profile){
+      document.getElementById('appName').value = state.profile.name || '';
+      const contact = state.profile.contact || '';
+      const isEmail = /\S+@\S+\.\S+/.test(contact);
+      document.getElementById('appEmail').value = isEmail ? contact : '';
+      document.getElementById('appPhone').value = isEmail ? '' : contact;
+    }
+    Ledger.openModal('applyOverlay');
+  });
+
+  document.getElementById('applyForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('appName').value.trim();
+    const email = document.getElementById('appEmail').value.trim();
+    const phone = document.getElementById('appPhone').value.trim();
+    const note = document.getElementById('appNote').value.trim();
+    if(!name || !/\S+@\S+\.\S+/.test(email)){ document.getElementById('applyError').classList.add('show'); return; }
+    const job = state.jobs.find(j => j.id === state.activeJobId);
+    const appId = 'app_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+    const application = {id:appId, jobId:job.id, jobTitle:job.title, company:job.company, name, email, phone, note, appliedAt:Date.now(), status:'Submitted'};
+    await Ledger.dbSet('applications:'+appId, application, true);
+    const mine = (await Ledger.dbGet('my-applications', false)) || [];
+    mine.unshift({id:appId, jobId:job.id, jobTitle:job.title, company:job.company, appliedAt:application.appliedAt, status:'Submitted'});
+    await Ledger.dbSet('my-applications', mine, false);
+    if(document.getElementById('appSaveProfile').checked){
+      state.profile = {name, email, phone};
+      await Ledger.setProfile(state.profile);
+    }
+    Ledger.closeModal('applyOverlay');
+    e.target.reset();
+    document.getElementById('appSaveProfile').checked = true;
+    Ledger.showToast('Application filed for ' + job.title + ' at ' + job.company + '.');
+  });
+
+  if(state.search.keyword || state.search.city) render();
+})();
+</script>
+
+</body>
+</html>

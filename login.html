@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log in — Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="index.html" class="logo"><span class="logo-mark">L</span>Ledger</a>
+    <nav class="nav-links" id="navLinks">
+      <a href="jobs.html">Browse jobs</a>
+      <a href="companies.html">Companies</a>
+      <a href="applications.html">My applications</a>
+      <a href="messages.html">Messages</a>
+      <a href="advice.html">Advice</a>
+    </nav>
+    <div class="nav-right">
+      <a href="login.html" id="loginLink" data-login-link>Log in</a>
+      <a href="post-job.html" class="btn btn-solid">Post a job</a>
+      <button type="button" class="menu-toggle" id="menuToggle" aria-label="Toggle menu" aria-expanded="false"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<section class="auth-wrap wrap">
+  <div class="auth-card">
+
+    <div id="authFormWrap">
+      <h1 id="authHeading">Log in</h1>
+      <div class="auth-sub" id="authSub">Log in to apply faster and track your applications.</div>
+
+      <button type="button" class="social-btn" id="googleBtn">
+        <span class="social-icon google">G</span> Continue with Google <span class="simulated-tag">Simulated</span>
+      </button>
+      <button type="button" class="social-btn" id="facebookBtn">
+        <span class="social-icon facebook">f</span> Continue with Facebook <span class="simulated-tag">Simulated</span>
+      </button>
+
+      <div class="auth-divider">or continue with email</div>
+
+      <form id="profileForm">
+        <div class="field" id="nameField" style="display:none;"><label for="profName">Full name</label><input type="text" id="profName" placeholder="Jordan Reyes"></div>
+        <div class="field"><label for="profContact">Email address</label><input type="email" id="profContact" placeholder="you@email.com" required></div>
+        <div class="field"><label for="profPassword">Password</label><input type="password" id="profPassword" placeholder="••••••••" required></div>
+        <div class="modal-error" id="profileError">Please fill in your name, an email or phone number, and a password.</div>
+        <button type="submit" class="btn btn-rust" style="width:100%; padding:15px;" id="profileSubmit">Log in</button>
+      </form>
+
+      <button type="button" class="btn" style="width:100%; padding:13px; margin-top:12px;" id="authToggle">Create an account</button>
+
+      <div class="auth-note">
+        Google and Facebook sign-in are simulated in this demo (no real account is contacted) — they prefill this form so you can see the flow. Your file, including the password field, is stored locally on this device only and is not encrypted — don't reuse a real password here.
+      </div>
+    </div>
+
+    <div id="verifyPanel" style="display:none;">
+      <h1>Check your email</h1>
+      <div class="auth-sub">Enter the 6-digit code we sent to <strong id="verifyContact"></strong> to verify your account.</div>
+
+      <div class="auth-note" id="verifyDemoNote" style="text-align:left; margin-top:0; margin-bottom:20px; padding:14px 16px; border-radius:12px; box-shadow:var(--sh-inset); display:none;">
+        This is a static prototype with no email server, so no real message is sent. Your code is shown here so you can complete the flow: <strong id="verifyCodeDisplay" style="font-family:'IBM Plex Mono',monospace;"></strong>
+      </div>
+
+      <form id="verifyForm">
+        <div class="field"><label for="verifyCodeInput">Verification code</label><input type="text" id="verifyCodeInput" inputmode="numeric" maxlength="6" placeholder="000000" required></div>
+        <div class="modal-error" id="verifyError">That code doesn't match. Check it and try again.</div>
+        <button type="submit" class="btn btn-rust" style="width:100%; padding:15px;">Verify and create account</button>
+      </form>
+
+      <button type="button" class="btn" style="width:100%; padding:13px; margin-top:12px;" id="resendCodeBtn">Resend code</button>
+      <button type="button" class="btn" style="width:100%; padding:13px; margin-top:10px;" id="backToSignupBtn">Back</button>
+    </div>
+
+  </div>
+</section>
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo"><span class="logo-mark">L</span>Ledger</div>
+        <p>A job board that files every listing like it matters — because someone's next paycheck depends on it.</p>
+      </div>
+      <div>
+        <h4>For applicants</h4>
+        <ul>
+          <li><a href="jobs.html">Browse jobs</a></li>
+          <li><a href="applications.html">My applications</a></li>
+          <li><a href="advice.html">Career advice</a></li>
+          <li><a href="advice.html">Salary guide</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>For companies</h4>
+        <ul>
+          <li><a href="post-job.html">Post a job</a></li>
+          <li><a href="companies.html">Companies hiring</a></li>
+          <li><a href="login.html">Employer login</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Ledger</h4>
+        <ul>
+          <li><a href="index.html">About</a></li>
+          <li><a href="advice.html">Contact</a></li>
+          <li><a href="index.html">Privacy</a></li>
+          <li><a href="admin.html">Admin</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Ledger Job Co.</span>
+      <span>Filed in Austin, TX</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="ldgToast"></div>
+<script src="js/app.js"></script>
+
+<script>
+// Point this at your deployed ledger-server (see the README in that project).
+// Example: 'https://your-server.onrender.com/api/auth'
+const AUTH_API_BASE = 'http://localhost:4000/api/auth';
+
+(async function(){
+  const existing = await Ledger.getProfile();
+  if(existing){ location.href = 'account.html'; return; }
+
+  let mode = 'login'; // 'login' | 'signup'
+
+  const heading = document.getElementById('authHeading');
+  const sub = document.getElementById('authSub');
+  const nameField = document.getElementById('nameField');
+  const profName = document.getElementById('profName');
+  const submitBtn = document.getElementById('profileSubmit');
+  const toggleBtn = document.getElementById('authToggle');
+  const errorBox = document.getElementById('profileError');
+
+  function renderMode(){
+    errorBox.classList.remove('show');
+    if(mode === 'signup'){
+      heading.textContent = 'Create your file';
+      sub.textContent = 'Create an account to apply faster and track your applications.';
+      nameField.style.display = '';
+      profName.required = true;
+      submitBtn.textContent = 'Create account';
+      toggleBtn.textContent = 'Already have an account? Log in';
+      errorBox.textContent = 'Please fill in your name, a valid email, and a password (8+ characters).';
+    } else {
+      heading.textContent = 'Log in';
+      sub.textContent = 'Log in to apply faster and track your applications.';
+      nameField.style.display = 'none';
+      profName.required = false;
+      submitBtn.textContent = 'Log in';
+      toggleBtn.textContent = 'Create an account';
+      errorBox.textContent = 'Incorrect email or password.';
+    }
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    mode = (mode === 'login') ? 'signup' : 'login';
+    renderMode();
+  });
+
+  // ---- Real email verification, via the ledger-server backend ----
+  const authFormWrap = document.getElementById('authFormWrap');
+  const verifyPanel = document.getElementById('verifyPanel');
+  const verifyContact = document.getElementById('verifyContact');
+  const verifyCodeInput = document.getElementById('verifyCodeInput');
+  const verifyError = document.getElementById('verifyError');
+  const resendCodeBtn = document.getElementById('resendCodeBtn');
+  const backToSignupBtn = document.getElementById('backToSignupBtn');
+
+  let pendingEmail = null;
+
+  async function apiPost(path, body){
+    let res, data;
+    try{
+      res = await fetch(AUTH_API_BASE + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      data = await res.json().catch(() => ({}));
+    } catch(networkErr){
+      throw new Error('Could not reach the auth server. Is it running and is AUTH_API_BASE set correctly?');
+    }
+    if(!res.ok){
+      throw new Error(data.error || 'Something went wrong.');
+    }
+    return data;
+  }
+
+  async function sendVerification(){
+    verifyContact.textContent = pendingEmail;
+    verifyCodeInput.value = '';
+    verifyError.classList.remove('show');
+    try{
+      await apiPost('/signup/resend', { email: pendingEmail });
+      Ledger.showToast('Verification code sent to ' + pendingEmail + '.');
+    } catch(err){
+      verifyError.textContent = err.message;
+      verifyError.classList.add('show');
+    }
+  }
+
+  function showVerifyPanel(){
+    authFormWrap.style.display = 'none';
+    verifyPanel.style.display = '';
+    verifyContact.textContent = pendingEmail;
+    verifyCodeInput.value = '';
+    verifyError.classList.remove('show');
+    verifyCodeInput.focus();
+  }
+
+  function showAuthForm(){
+    verifyPanel.style.display = 'none';
+    authFormWrap.style.display = '';
+    pendingEmail = null;
+  }
+
+  resendCodeBtn.addEventListener('click', () => { sendVerification(); });
+  backToSignupBtn.addEventListener('click', () => { showAuthForm(); });
+
+  const verifyForm = document.getElementById('verifyForm');
+  verifyForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const code = verifyCodeInput.value.trim();
+    verifyError.classList.remove('show');
+    try{
+      const { token, account } = await apiPost('/signup/verify', { email: pendingEmail, code });
+      // Cache the verified profile locally so the rest of this static site
+      // (header greeting, account.html, etc.) keeps working as before.
+      await Ledger.setProfile({ name: account.name, contact: account.email, verified: true, authToken: token });
+      Ledger.showToast('Email verified. Welcome, ' + account.name.split(' ')[0] + '.');
+      const params = new URLSearchParams(location.search);
+      const dest = params.get('redirect') || 'account.html';
+      pendingEmail = null;
+      setTimeout(() => location.href = dest, 700);
+    } catch(err){
+      verifyError.textContent = err.message;
+      verifyError.classList.add('show');
+    }
+  });
+
+  document.getElementById('googleBtn').addEventListener('click', () => {
+    Ledger.showToast('Simulated Google session started — confirm details below.');
+    mode = 'signup';
+    renderMode();
+    document.getElementById('profName').value = 'Alex Rivera';
+    document.getElementById('profContact').value = 'alex.rivera@gmail.com';
+    document.getElementById('profPassword').value = 'demo1234pass';
+    document.getElementById('profName').focus();
+  });
+  document.getElementById('facebookBtn').addEventListener('click', () => {
+    Ledger.showToast('Simulated Facebook session started — confirm details below.');
+    mode = 'signup';
+    renderMode();
+    document.getElementById('profName').value = 'Alex Rivera';
+    document.getElementById('profContact').value = 'alex.rivera@outlook.com';
+    document.getElementById('profPassword').value = 'demo1234pass';
+    document.getElementById('profName').focus();
+  });
+
+  document.getElementById('profileForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const contact = document.getElementById('profContact').value.trim();
+    const password = document.getElementById('profPassword').value;
+
+    if(mode === 'signup'){
+      const name = profName.value.trim();
+      errorBox.classList.remove('show');
+      submitBtn.disabled = true;
+      try{
+        await apiPost('/signup/start', { name, email: contact, password });
+        pendingEmail = contact;
+        showVerifyPanel();
+      } catch(err){
+        errorBox.textContent = err.message;
+        errorBox.classList.add('show');
+      } finally {
+        submitBtn.disabled = false;
+      }
+    } else {
+      errorBox.classList.remove('show');
+      submitBtn.disabled = true;
+      try{
+        const { token, account } = await apiPost('/login', { email: contact, password });
+        await Ledger.setProfile({ name: account.name, contact: account.email, verified: account.verified, authToken: token });
+        Ledger.showToast('Welcome back, ' + account.name.split(' ')[0] + '.');
+        const params = new URLSearchParams(location.search);
+        setTimeout(() => location.href = params.get('redirect') || 'account.html', 500);
+      } catch(err){
+        errorBox.textContent = err.message;
+        errorBox.classList.add('show');
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
+  });
+
+  renderMode();
+})();
+</script>
+
+</body>
+</html>
