@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My applications — Ledger</title>
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<link rel="icon" type="image/png" href="images/favicon-256.png">
+<title>My applications — PrimeSphere</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
@@ -12,7 +14,7 @@
 
 <header>
   <div class="wrap nav">
-    <a href="index.html" class="logo"><span class="logo-mark">L</span>Ledger</a>
+    <a href="index.html" class="logo"><img src="images/logo-mark.png" alt="PrimeSphere" class="logo-img"></a>
     <nav class="nav-links" id="navLinks">
       <a href="jobs.html">Browse jobs</a>
       <a href="companies.html">Companies</a>
@@ -53,7 +55,7 @@
   <div class="wrap">
     <div class="footer-top">
       <div class="footer-brand">
-        <div class="logo"><span class="logo-mark">L</span>Ledger</div>
+        <div class="logo"><img src="images/logo-full.png" alt="PrimeSphere" class="logo-img"></div>
         <p>A job board that files every listing like it matters — because someone's next paycheck depends on it.</p>
       </div>
       <div>
@@ -74,7 +76,7 @@
         </ul>
       </div>
       <div>
-        <h4>Ledger</h4>
+        <h4>PrimeSphere</h4>
         <ul>
           <li><a href="index.html">About</a></li>
           <li><a href="advice.html">Contact</a></li>
@@ -84,7 +86,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 Ledger Job Co.</span>
+      <span>© 2026 PrimeSphere Job Co.</span>
       <span>Filed in Austin, TX</span>
     </div>
   </div>
@@ -95,16 +97,16 @@
 
 <script>
 (async function(){
-  const mine = (await Ledger.dbGet('my-applications', false)) || [];
+  const mine = (await PrimeSphere.dbGet('my-applications', false)) || [];
   const list = document.getElementById('trackList');
   if(!mine.length){
     list.innerHTML = '<div class="empty-track">No applications filed yet from this browser. <a href="jobs.html" style="color:var(--rust);">Browse open roles →</a></div>';
   } else {
     list.innerHTML = mine.map(a => `
       <div class="app-track-item">
-        <h4>${Ledger.escapeHtml(a.jobTitle)}</h4>
-        <div style="color:var(--ink-soft); font-size:12.5px;">${Ledger.escapeHtml(a.company)}</div>
-        <div class="meta"><span class="status">${Ledger.escapeHtml(a.status)}</span><span>${new Date(a.appliedAt).toLocaleDateString()}</span></div>
+        <h4>${PrimeSphere.escapeHtml(a.jobTitle)}</h4>
+        <div style="color:var(--ink-soft); font-size:12.5px;">${PrimeSphere.escapeHtml(a.company)}</div>
+        <div class="meta"><span class="status">${PrimeSphere.escapeHtml(a.status)}</span><span>${new Date(a.appliedAt).toLocaleDateString()}</span></div>
       </div>`).join('');
   }
 })();

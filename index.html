@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ledger — Find work worth showing up for</title>
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<link rel="icon" type="image/png" href="images/favicon-256.png">
+<title>PrimeSphere — Find work worth showing up for</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
@@ -12,7 +14,7 @@
 
 <header>
   <div class="wrap nav">
-    <a href="index.html" class="logo"><span class="logo-mark">L</span>Ledger</a>
+    <a href="index.html" class="logo"><img src="images/logo-mark.png" alt="PrimeSphere" class="logo-img"></a>
     <nav class="nav-links" id="navLinks">
       <a href="jobs.html">Browse jobs</a>
       <a href="companies.html">Companies</a>
@@ -33,7 +35,7 @@
     <div>
       <span class="eyebrow">No. 001 — Since 2019</span>
       <h1>Work worth <em>showing up</em> for.</h1>
-      <p class="lead">Every listing on Ledger is verified, dated, and filed by a real hiring team — no ghost postings, no dead ends. Find the role, apply, and get an answer.</p>
+      <p class="lead">Every listing on PrimeSphere is verified, dated, and filed by a real hiring team — no ghost postings, no dead ends. Find the role, apply, and get an answer.</p>
       <div class="hero-ctas">
         <a href="jobs.html" class="btn btn-rust">Browse open roles</a>
         <a href="#howItWorks" class="btn">How it works</a>
@@ -148,7 +150,7 @@
   <div class="wrap">
     <div class="footer-top">
       <div class="footer-brand">
-        <div class="logo"><span class="logo-mark">L</span>Ledger</div>
+        <div class="logo"><img src="images/logo-full.png" alt="PrimeSphere" class="logo-img"></div>
         <p>A job board that files every listing like it matters — because someone's next paycheck depends on it.</p>
       </div>
       <div>
@@ -169,7 +171,7 @@
         </ul>
       </div>
       <div>
-        <h4>Ledger</h4>
+        <h4>PrimeSphere</h4>
         <ul>
           <li><a href="index.html">About</a></li>
           <li><a href="advice.html">Contact</a></li>
@@ -179,7 +181,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 Ledger Job Co.</span>
+      <span>© 2026 PrimeSphere Job Co.</span>
       <span>Filed in Austin, TX</span>
     </div>
   </div>
@@ -190,13 +192,13 @@
 
 <script>
 (async function(){
-  const jobs = await Ledger.loadJobs();
+  const jobs = await PrimeSphere.loadJobs();
   document.getElementById('statJobs').textContent = jobs.length;
   const companies = [...new Set(jobs.map(j => j.company))];
   document.getElementById('statCompanies').textContent = companies.length;
   const sc2 = document.getElementById('statCompanies2'); if(sc2) sc2.textContent = companies.length;
   const strip = document.getElementById('companyStrip');
-  if(strip && companies.length) strip.innerHTML = companies.slice(0,8).map(c => `<span>${Ledger.escapeHtml(c)}</span>`).join('');
+  if(strip && companies.length) strip.innerHTML = companies.slice(0,8).map(c => `<span>${PrimeSphere.escapeHtml(c)}</span>`).join('');
 
   document.getElementById('searchBtn').addEventListener('click', () => {
     const kw = encodeURIComponent(document.getElementById('searchKeyword').value.trim());

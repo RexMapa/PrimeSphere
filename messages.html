@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Messages — Ledger</title>
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<link rel="icon" type="image/png" href="images/favicon-256.png">
+<title>Messages — PrimeSphere</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
@@ -12,7 +14,7 @@
 
 <header>
   <div class="wrap nav">
-    <a href="index.html" class="logo"><span class="logo-mark">L</span>Ledger</a>
+    <a href="index.html" class="logo"><img src="images/logo-mark.png" alt="PrimeSphere" class="logo-img"></a>
     <nav class="nav-links" id="navLinks">
       <a href="jobs.html">Browse jobs</a>
       <a href="companies.html">Companies</a>
@@ -32,7 +34,7 @@
   <div class="wrap">
     <span class="eyebrow">Talk to us</span>
     <h1>Messages</h1>
-    <p>Questions about an application or a listing? Message the Ledger team directly — a real person replies here.</p>
+    <p>Questions about an application or a listing? Message the PrimeSphere team directly — a real person replies here.</p>
   </div>
 </section>
 
@@ -40,7 +42,7 @@
   <div class="chat-shell chat-shell-solo">
     <div class="chat-panel">
       <div class="chat-panel-head">
-        <h3>Ledger support</h3>
+        <h3>PrimeSphere support</h3>
         <p>Usually replies within a business day.</p>
       </div>
       <div class="chat-thread" id="chatThread">
@@ -58,7 +60,7 @@
   <div class="wrap">
     <div class="footer-top">
       <div class="footer-brand">
-        <div class="logo"><span class="logo-mark">L</span>Ledger</div>
+        <div class="logo"><img src="images/logo-full.png" alt="PrimeSphere" class="logo-img"></div>
         <p>A job board that files every listing like it matters — because someone's next paycheck depends on it.</p>
       </div>
       <div>
@@ -79,7 +81,7 @@
         </ul>
       </div>
       <div>
-        <h4>Ledger</h4>
+        <h4>PrimeSphere</h4>
         <ul>
           <li><a href="index.html">About</a></li>
           <li><a href="advice.html">Contact</a></li>
@@ -89,7 +91,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 Ledger Job Co.</span>
+      <span>© 2026 PrimeSphere Job Co.</span>
       <span>Filed in Austin, TX</span>
     </div>
   </div>
@@ -123,13 +125,13 @@ const API_BASE = '/api';
 
   function renderThread(messages){
     if(!messages.length){
-      threadEl.innerHTML = '<div class="chat-empty">No messages yet. Say hello below — the Ledger team will reply here.</div>';
+      threadEl.innerHTML = '<div class="chat-empty">No messages yet. Say hello below — the PrimeSphere team will reply here.</div>';
       return;
     }
     const wasAtBottom = threadEl.scrollTop + threadEl.clientHeight >= threadEl.scrollHeight - 40;
     threadEl.innerHTML = messages.map(m => `
       <div class="msg-row from-${m.sender === 'admin' ? 'admin' : 'user'}">
-        <div class="msg-bubble">${Ledger.escapeHtml(m.text)}<span class="msg-time">${fmtTime(m.at)}</span></div>
+        <div class="msg-bubble">${PrimeSphere.escapeHtml(m.text)}<span class="msg-time">${fmtTime(m.at)}</span></div>
       </div>`).join('');
     if(wasAtBottom || lastMessageCount === 0){
       threadEl.scrollTop = threadEl.scrollHeight;
@@ -160,7 +162,7 @@ const API_BASE = '/api';
       renderThread(conversation.messages);
     } catch(err){
       if(lastMessageCount === 0){
-        threadEl.innerHTML = '<div class="chat-empty">' + Ledger.escapeHtml(err.message) + '</div>';
+        threadEl.innerHTML = '<div class="chat-empty">' + PrimeSphere.escapeHtml(err.message) + '</div>';
       }
     }
   }
@@ -174,7 +176,7 @@ const API_BASE = '/api';
       input.style.height = 'auto';
       await loadThread();
     } catch(err){
-      Ledger.showToast(err.message);
+      PrimeSphere.showToast(err.message);
     } finally {
       sending = false;
       sendBtn.disabled = false;
@@ -199,7 +201,7 @@ const API_BASE = '/api';
   });
 
   (async function init(){
-    profile = await Ledger.getProfile();
+    profile = await PrimeSphere.getProfile();
     if(!profile || !profile.authToken){
       location.href = 'login.html?redirect=messages.html';
       return;

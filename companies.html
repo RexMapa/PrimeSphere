@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Companies hiring — Ledger</title>
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<link rel="icon" type="image/png" href="images/favicon-256.png">
+<title>Companies hiring — PrimeSphere</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
@@ -12,7 +14,7 @@
 
 <header>
   <div class="wrap nav">
-    <a href="index.html" class="logo"><span class="logo-mark">L</span>Ledger</a>
+    <a href="index.html" class="logo"><img src="images/logo-mark.png" alt="PrimeSphere" class="logo-img"></a>
     <nav class="nav-links" id="navLinks">
       <a href="jobs.html">Browse jobs</a>
       <a href="companies.html">Companies</a>
@@ -31,8 +33,8 @@
 <section class="page-hero">
   <div class="wrap">
     <span class="eyebrow">3,150+ companies filing</span>
-    <h1>Companies hiring on Ledger</h1>
-    <p>Every company on Ledger reviews applications personally — no auto-rejections, no black holes.</p>
+    <h1>Companies hiring on PrimeSphere</h1>
+    <p>Every company on PrimeSphere reviews applications personally — no auto-rejections, no black holes.</p>
   </div>
 </section>
 <section class="section wrap" style="padding-top:0;">
@@ -53,7 +55,7 @@
   <div class="wrap">
     <div class="footer-top">
       <div class="footer-brand">
-        <div class="logo"><span class="logo-mark">L</span>Ledger</div>
+        <div class="logo"><img src="images/logo-full.png" alt="PrimeSphere" class="logo-img"></div>
         <p>A job board that files every listing like it matters — because someone's next paycheck depends on it.</p>
       </div>
       <div>
@@ -74,7 +76,7 @@
         </ul>
       </div>
       <div>
-        <h4>Ledger</h4>
+        <h4>PrimeSphere</h4>
         <ul>
           <li><a href="index.html">About</a></li>
           <li><a href="advice.html">Contact</a></li>
@@ -84,7 +86,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 Ledger Job Co.</span>
+      <span>© 2026 PrimeSphere Job Co.</span>
       <span>Filed in Austin, TX</span>
     </div>
   </div>
@@ -95,7 +97,7 @@
 
 <script>
 (async function(){
-  const jobs = await Ledger.loadJobs();
+  const jobs = await PrimeSphere.loadJobs();
   const byCompany = {};
   jobs.forEach(j => {
     if(!byCompany[j.company]) byCompany[j.company] = {name:j.company, dept:j.dept, count:0};
@@ -104,9 +106,9 @@
   const companies = Object.values(byCompany).sort((a,b) => b.count - a.count);
   document.getElementById('companyGrid').innerHTML = companies.map(c => `
     <div class="company-card">
-      <div class="company-mark">${Ledger.escapeHtml(c.name.charAt(0))}</div>
-      <h3>${Ledger.escapeHtml(c.name)}</h3>
-      <div class="co-sub">Primarily hiring · ${Ledger.escapeHtml(c.dept)}</div>
+      <div class="company-mark">${PrimeSphere.escapeHtml(c.name.charAt(0))}</div>
+      <h3>${PrimeSphere.escapeHtml(c.name)}</h3>
+      <div class="co-sub">Primarily hiring · ${PrimeSphere.escapeHtml(c.dept)}</div>
       <div class="co-stat">${c.count} open role${c.count===1?'':'s'}</div>
       <a class="btn" href="jobs.html?kw=${encodeURIComponent(c.name)}">View roles</a>
     </div>`).join('') || '<p style="color:var(--ink-soft)">No companies filed yet.</p>';

@@ -1,9 +1,9 @@
-/* ===================== Ledger — shared site logic ===================== */
+/* ===================== PrimeSphere — shared site logic ===================== */
 /* Loaded on every page. Provides the "database" layer (persistent storage),
    header/menu wiring, toasts, generic modal helpers, and profile/session
    handling (including simulated Google / Facebook sign-in). */
 
-const Ledger = (function(){
+const PrimeSphere = (function(){
   "use strict";
 
   /* ---------------- storage / "database" layer ---------------- */

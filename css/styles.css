@@ -51,6 +51,12 @@
     display:flex; align-items:center; gap:12px;
     font-family:'Fraunces', serif; font-size:22px; font-weight:600;
   }
+  .logo-img{
+    height:38px; width:auto; display:block;
+  }
+  .footer-brand .logo-img{
+    height:34px;
+  }
   .logo-mark{
     width:36px; height:36px; border-radius:12px;
     display:flex; align-items:center; justify-content:center;

@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Your account — Ledger</title>
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<link rel="icon" type="image/png" href="images/favicon-256.png">
+<title>Your account — PrimeSphere</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
@@ -12,7 +14,7 @@
 
 <header>
   <div class="wrap nav">
-    <a href="index.html" class="logo"><span class="logo-mark">L</span>Ledger</a>
+    <a href="index.html" class="logo"><img src="images/logo-mark.png" alt="PrimeSphere" class="logo-img"></a>
     <nav class="nav-links" id="navLinks">
       <a href="jobs.html">Browse jobs</a>
       <a href="companies.html">Companies</a>
@@ -32,7 +34,7 @@
   <div class="wrap">
     <span class="eyebrow">Your file</span>
     <h1 id="acctHeading">Account</h1>
-    <p>Manage the details Ledger uses to speed up your applications.</p>
+    <p>Manage the details PrimeSphere uses to speed up your applications.</p>
   </div>
 </section>
 <section class="section wrap" style="padding-top:0;" id="acctSection">
@@ -61,7 +63,7 @@
   <div class="wrap">
     <div class="footer-top">
       <div class="footer-brand">
-        <div class="logo"><span class="logo-mark">L</span>Ledger</div>
+        <div class="logo"><img src="images/logo-full.png" alt="PrimeSphere" class="logo-img"></div>
         <p>A job board that files every listing like it matters — because someone's next paycheck depends on it.</p>
       </div>
       <div>
@@ -82,7 +84,7 @@
         </ul>
       </div>
       <div>
-        <h4>Ledger</h4>
+        <h4>PrimeSphere</h4>
         <ul>
           <li><a href="index.html">About</a></li>
           <li><a href="advice.html">Contact</a></li>
@@ -92,7 +94,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 Ledger Job Co.</span>
+      <span>© 2026 PrimeSphere Job Co.</span>
       <span>Filed in Austin, TX</span>
     </div>
   </div>
@@ -103,7 +105,7 @@
 
 <script>
 (async function(){
-  const profile = await Ledger.getProfile();
+  const profile = await PrimeSphere.getProfile();
   if(!profile){ location.href = 'login.html?redirect=account.html'; return; }
   document.getElementById('acctHeading').textContent = 'Hi, ' + profile.name.split(' ')[0];
   document.getElementById('acctAvatar').textContent = profile.name.charAt(0).toUpperCase();
@@ -116,8 +118,8 @@
 
   document.getElementById('logoutBtn').addEventListener('click', async (e) => {
     e.preventDefault();
-    await Ledger.clearProfile();
-    Ledger.showToast('Logged out on this device.');
+    await PrimeSphere.clearProfile();
+    PrimeSphere.showToast('Logged out on this device.');
     setTimeout(() => location.href = 'index.html', 500);
   });
 
@@ -129,8 +131,8 @@
     const contactOk = /\S+@\S+\.\S+/.test(contact) || /^[\d()+\-.\s]{7,}$/.test(contact);
     if(!name || !contactOk || password.length < 4){ document.getElementById('editError').classList.add('show'); return; }
     document.getElementById('editError').classList.remove('show');
-    await Ledger.setProfile({name, contact, password});
-    Ledger.showToast('Your file was updated.');
+    await PrimeSphere.setProfile({name, contact, password});
+    PrimeSphere.showToast('Your file was updated.');
     location.reload();
   });
 })();

@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin inbox — Ledger</title>
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<link rel="icon" type="image/png" href="images/favicon-256.png">
+<title>Admin inbox — PrimeSphere</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
@@ -12,7 +14,7 @@
 
 <header>
   <div class="wrap admin-console-header">
-    <a href="index.html" class="logo"><span class="logo-mark">L</span>Ledger</a>
+    <a href="index.html" class="logo"><img src="images/logo-mark.png" alt="PrimeSphere" class="logo-img"></a>
     <div style="display:flex; align-items:center; gap:14px;">
       <span class="admin-badge">Admin</span>
       <a href="#" class="btn" id="logoutBtn" style="display:none;">Log out</a>
@@ -114,11 +116,11 @@ const SESSION_KEY = 'admin-session';
       return;
     }
     convoList.innerHTML = conversations.map(c => `
-      <div class="convo-item ${c.accountId === activeAccountId ? 'active' : ''}" data-id="${Ledger.escapeHtml(c.accountId)}">
-        <div class="convo-avatar">${Ledger.escapeHtml((c.name || '?').charAt(0).toUpperCase())}</div>
+      <div class="convo-item ${c.accountId === activeAccountId ? 'active' : ''}" data-id="${PrimeSphere.escapeHtml(c.accountId)}">
+        <div class="convo-avatar">${PrimeSphere.escapeHtml((c.name || '?').charAt(0).toUpperCase())}</div>
         <div class="convo-meta">
-          <div class="convo-name">${Ledger.escapeHtml(c.name)} ${c.unreadForAdmin ? '<span class="convo-unread">' + c.unreadForAdmin + '</span>' : ''}</div>
-          <div class="convo-snippet">${c.lastMessage ? Ledger.escapeHtml(c.lastMessage.text) : 'No messages yet'}</div>
+          <div class="convo-name">${PrimeSphere.escapeHtml(c.name)} ${c.unreadForAdmin ? '<span class="convo-unread">' + c.unreadForAdmin + '</span>' : ''}</div>
+          <div class="convo-snippet">${c.lastMessage ? PrimeSphere.escapeHtml(c.lastMessage.text) : 'No messages yet'}</div>
         </div>
       </div>`).join('');
     convoList.querySelectorAll('.convo-item').forEach(el => {
@@ -132,19 +134,19 @@ const SESSION_KEY = 'admin-session';
       conversations = list;
       renderConvoList();
     } catch(err){
-      convoList.innerHTML = '<div class="convo-empty">' + Ledger.escapeHtml(err.message) + '</div>';
+      convoList.innerHTML = '<div class="convo-empty">' + PrimeSphere.escapeHtml(err.message) + '</div>';
     }
   }
 
   function renderThread(conv){
-    chatHead.innerHTML = `<h3>${Ledger.escapeHtml(conv.name)}</h3><p>${Ledger.escapeHtml(conv.email)}</p>`;
+    chatHead.innerHTML = `<h3>${PrimeSphere.escapeHtml(conv.name)}</h3><p>${PrimeSphere.escapeHtml(conv.email)}</p>`;
     if(!conv.messages.length){
       chatThread.innerHTML = '<div class="chat-empty">No messages yet in this thread.</div>';
     } else {
       const wasAtBottom = chatThread.scrollTop + chatThread.clientHeight >= chatThread.scrollHeight - 40;
       chatThread.innerHTML = conv.messages.map(m => `
         <div class="msg-row from-${m.sender === 'admin' ? 'admin' : 'user'}">
-          <div class="msg-bubble">${Ledger.escapeHtml(m.text)}<span class="msg-time">${fmtTime(m.at)}</span></div>
+          <div class="msg-bubble">${PrimeSphere.escapeHtml(m.text)}<span class="msg-time">${fmtTime(m.at)}</span></div>
         </div>`).join('');
       if(wasAtBottom) chatThread.scrollTop = chatThread.scrollHeight;
     }
@@ -160,7 +162,7 @@ const SESSION_KEY = 'admin-session';
       if(c) c.unreadForAdmin = 0;
       renderConvoList();
     } catch(err){
-      chatThread.innerHTML = '<div class="chat-empty">' + Ledger.escapeHtml(err.message) + '</div>';
+      chatThread.innerHTML = '<div class="chat-empty">' + PrimeSphere.escapeHtml(err.message) + '</div>';
     }
   }
 
@@ -198,7 +200,7 @@ const SESSION_KEY = 'admin-session';
       await loadThread(activeAccountId);
       await loadConversations();
     } catch(err){
-      Ledger.showToast(err.message);
+      PrimeSphere.showToast(err.message);
     } finally {
       sending = false;
       chatSend.disabled = false;
@@ -224,7 +226,7 @@ const SESSION_KEY = 'admin-session';
 
   logoutBtn.addEventListener('click', async (e) => {
     e.preventDefault();
-    await Ledger.dbDelete(SESSION_KEY, false);
+    await PrimeSphere.dbDelete(SESSION_KEY, false);
     session = null;
     showLogin();
   });
@@ -250,7 +252,7 @@ const SESSION_KEY = 'admin-session';
         throw new Error('This account does not have admin access.');
       }
       session = { authToken: data.token, name: data.account.name, email: data.account.email };
-      await Ledger.dbSet(SESSION_KEY, session, false);
+      await PrimeSphere.dbSet(SESSION_KEY, session, false);
       showInbox();
     } catch(err){
       loginError.textContent = err.message;
@@ -261,7 +263,7 @@ const SESSION_KEY = 'admin-session';
   });
 
   (async function init(){
-    session = await Ledger.dbGet(SESSION_KEY, false);
+    session = await PrimeSphere.dbGet(SESSION_KEY, false);
     if(session && session.authToken){
       showInbox();
     } else {

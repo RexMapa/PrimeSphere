@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Log in — Ledger</title>
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<link rel="icon" type="image/png" href="images/favicon-256.png">
+<title>Log in — PrimeSphere</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
@@ -12,7 +14,7 @@
 
 <header>
   <div class="wrap nav">
-    <a href="index.html" class="logo"><span class="logo-mark">L</span>Ledger</a>
+    <a href="index.html" class="logo"><img src="images/logo-mark.png" alt="PrimeSphere" class="logo-img"></a>
     <nav class="nav-links" id="navLinks">
       <a href="jobs.html">Browse jobs</a>
       <a href="companies.html">Companies</a>
@@ -83,7 +85,7 @@
   <div class="wrap">
     <div class="footer-top">
       <div class="footer-brand">
-        <div class="logo"><span class="logo-mark">L</span>Ledger</div>
+        <div class="logo"><img src="images/logo-full.png" alt="PrimeSphere" class="logo-img"></div>
         <p>A job board that files every listing like it matters — because someone's next paycheck depends on it.</p>
       </div>
       <div>
@@ -104,7 +106,7 @@
         </ul>
       </div>
       <div>
-        <h4>Ledger</h4>
+        <h4>PrimeSphere</h4>
         <ul>
           <li><a href="index.html">About</a></li>
           <li><a href="advice.html">Contact</a></li>
@@ -114,7 +116,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 Ledger Job Co.</span>
+      <span>© 2026 PrimeSphere Job Co.</span>
       <span>Filed in Austin, TX</span>
     </div>
   </div>
@@ -131,7 +133,7 @@
 const AUTH_API_BASE = '/api/auth';
 
 (async function(){
-  const existing = await Ledger.getProfile();
+  const existing = await PrimeSphere.getProfile();
   if(existing){ location.href = 'account.html'; return; }
 
   let mode = 'login'; // 'login' | 'signup'
@@ -205,7 +207,7 @@ const AUTH_API_BASE = '/api/auth';
     verifyError.classList.remove('show');
     try{
       await apiPost('/signup/resend', { email: pendingEmail });
-      Ledger.showToast('Verification code sent to ' + pendingEmail + '.');
+      PrimeSphere.showToast('Verification code sent to ' + pendingEmail + '.');
     } catch(err){
       verifyError.textContent = err.message;
       verifyError.classList.add('show');
@@ -239,8 +241,8 @@ const AUTH_API_BASE = '/api/auth';
       const { token, account } = await apiPost('/signup/verify', { email: pendingEmail, code });
       // Cache the verified profile locally so the rest of this static site
       // (header greeting, account.html, etc.) keeps working as before.
-      await Ledger.setProfile({ name: account.name, contact: account.email, verified: true, authToken: token });
-      Ledger.showToast('Email verified. Welcome, ' + account.name.split(' ')[0] + '.');
+      await PrimeSphere.setProfile({ name: account.name, contact: account.email, verified: true, authToken: token });
+      PrimeSphere.showToast('Email verified. Welcome, ' + account.name.split(' ')[0] + '.');
       const params = new URLSearchParams(location.search);
       const dest = params.get('redirect') || 'account.html';
       pendingEmail = null;
@@ -252,7 +254,7 @@ const AUTH_API_BASE = '/api/auth';
   });
 
   document.getElementById('googleBtn').addEventListener('click', () => {
-    Ledger.showToast('Simulated Google session started — confirm details below.');
+    PrimeSphere.showToast('Simulated Google session started — confirm details below.');
     mode = 'signup';
     renderMode();
     document.getElementById('profName').value = 'Alex Rivera';
@@ -261,7 +263,7 @@ const AUTH_API_BASE = '/api/auth';
     document.getElementById('profName').focus();
   });
   document.getElementById('facebookBtn').addEventListener('click', () => {
-    Ledger.showToast('Simulated Facebook session started — confirm details below.');
+    PrimeSphere.showToast('Simulated Facebook session started — confirm details below.');
     mode = 'signup';
     renderMode();
     document.getElementById('profName').value = 'Alex Rivera';
@@ -294,8 +296,8 @@ const AUTH_API_BASE = '/api/auth';
       submitBtn.disabled = true;
       try{
         const { token, account } = await apiPost('/login', { email: contact, password });
-        await Ledger.setProfile({ name: account.name, contact: account.email, verified: account.verified, authToken: token });
-        Ledger.showToast('Welcome back, ' + account.name.split(' ')[0] + '.');
+        await PrimeSphere.setProfile({ name: account.name, contact: account.email, verified: account.verified, authToken: token });
+        PrimeSphere.showToast('Welcome back, ' + account.name.split(' ')[0] + '.');
         const params = new URLSearchParams(location.search);
         setTimeout(() => location.href = params.get('redirect') || 'account.html', 500);
       } catch(err){
