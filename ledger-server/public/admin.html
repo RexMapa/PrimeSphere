@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<link rel="icon" type="image/png" href="images/favicon-256.png">
+<title>Admin inbox — PrimeSphere</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap admin-console-header">
+    <a href="index.html" class="logo"><img src="images/logo-mark.png" alt="PrimeSphere" class="logo-img"></a>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <span class="admin-badge">Admin</span>
+      <a href="#" class="btn" id="logoutBtn" style="display:none;">Log out</a>
+    </div>
+  </div>
+</header>
+
+<!-- ---------- Login gate ---------- -->
+<section class="auth-wrap wrap" id="loginSection">
+  <div class="auth-card">
+    <h1>Admin login</h1>
+    <div class="auth-sub">Log in with an account listed in <span class="mono">ADMIN_EMAILS</span> to open the inbox.</div>
+    <form id="adminLoginForm">
+      <div class="field"><label for="adminEmail">Email address</label><input type="email" id="adminEmail" required></div>
+      <div class="field"><label for="adminPassword">Password</label><input type="password" id="adminPassword" required></div>
+      <div class="modal-error" id="adminLoginError">Incorrect email or password.</div>
+      <button type="submit" class="btn btn-rust" style="width:100%; padding:15px;" id="adminLoginBtn">Log in</button>
+    </form>
+    <div class="auth-note">Don't have an admin account yet? Sign up as a regular jobseeker first with an email listed in the server's <span class="mono">ADMIN_EMAILS</span>, then log in here.</div>
+  </div>
+</section>
+
+<!-- ---------- Inbox ---------- -->
+<section class="section wrap" style="padding-top:24px; display:none;" id="inboxSection">
+  <div class="chat-shell">
+    <div class="convo-list" id="convoList">
+      <div class="convo-empty">Loading conversations…</div>
+    </div>
+    <div class="chat-panel">
+      <div class="chat-panel-head" id="chatHead">
+        <h3>Select a conversation</h3>
+        <p>Pick a jobseeker on the left to view and reply.</p>
+      </div>
+      <div class="chat-thread" id="chatThread">
+        <div class="chat-empty">No conversation selected.</div>
+      </div>
+      <form class="chat-input-row" id="chatForm" style="display:none;">
+        <textarea id="chatInput" rows="1" placeholder="Write a reply…" maxlength="4000"></textarea>
+        <button type="submit" class="btn btn-rust" id="chatSend">Reply</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="ldgToast"></div>
+<script src="js/app.js"></script>
+
+<script>
+// Point this at your deployed ledger-server (see the README in that project).
+// Relative path — works whether you're testing locally (server.js serves
+// both the site and /api/*) or on your deployed Hostinger domain.
+const API_BASE = '/api';
+const SESSION_KEY = 'admin-session';
+
+(function(){
+  const loginSection = document.getElementById('loginSection');
+  const inboxSection = document.getElementById('inboxSection');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const convoList = document.getElementById('convoList');
+  const chatHead = document.getElementById('chatHead');
+  const chatThread = document.getElementById('chatThread');
+  const chatForm = document.getElementById('chatForm');
+  const chatInput = document.getElementById('chatInput');
+  const chatSend = document.getElementById('chatSend');
+
+  let session = null; // { authToken, name, email }
+  let activeAccountId = null;
+  let conversations = [];
+  let convoPollTimer = null;
+  let threadPollTimer = null;
+  let sending = false;
+
+  function fmtTime(iso){
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, {month:'short', day:'numeric'}) + ' · ' +
+           d.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
+  }
+
+  async function apiFetch(path, opts){
+    opts = opts || {};
+    opts.headers = Object.assign({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + session.authToken,
+    }, opts.headers || {});
+    let res, data;
+    try{
+      res = await fetch(API_BASE + path, opts);
+      data = await res.json().catch(() => ({}));
+    } catch(e){
+      throw new Error('Could not reach the server. Is it running?');
+    }
+    if(!res.ok) throw new Error(data.error || 'Something went wrong.');
+    return data;
+  }
+
+  function renderConvoList(){
+    if(!conversations.length){
+      convoList.innerHTML = '<div class="convo-empty">No conversations yet. They\'ll appear here once a jobseeker sends a message.</div>';
+      return;
+    }
+    convoList.innerHTML = conversations.map(c => `
+      <div class="convo-item ${c.accountId === activeAccountId ? 'active' : ''}" data-id="${PrimeSphere.escapeHtml(c.accountId)}">
+        <div class="convo-avatar">${PrimeSphere.escapeHtml((c.name || '?').charAt(0).toUpperCase())}</div>
+        <div class="convo-meta">
+          <div class="convo-name">${PrimeSphere.escapeHtml(c.name)} ${c.unreadForAdmin ? '<span class="convo-unread">' + c.unreadForAdmin + '</span>' : ''}</div>
+          <div class="convo-snippet">${c.lastMessage ? PrimeSphere.escapeHtml(c.lastMessage.text) : 'No messages yet'}</div>
+        </div>
+      </div>`).join('');
+    convoList.querySelectorAll('.convo-item').forEach(el => {
+      el.addEventListener('click', () => openConversation(el.getAttribute('data-id')));
+    });
+  }
+
+  async function loadConversations(){
+    try{
+      const { conversations: list } = await apiFetch('/messages/conversations');
+      conversations = list;
+      renderConvoList();
+    } catch(err){
+      convoList.innerHTML = '<div class="convo-empty">' + PrimeSphere.escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  function renderThread(conv){
+    chatHead.innerHTML = `<h3>${PrimeSphere.escapeHtml(conv.name)}</h3><p>${PrimeSphere.escapeHtml(conv.email)}</p>`;
+    if(!conv.messages.length){
+      chatThread.innerHTML = '<div class="chat-empty">No messages yet in this thread.</div>';
+    } else {
+      const wasAtBottom = chatThread.scrollTop + chatThread.clientHeight >= chatThread.scrollHeight - 40;
+      chatThread.innerHTML = conv.messages.map(m => `
+        <div class="msg-row from-${m.sender === 'admin' ? 'admin' : 'user'}">
+          <div class="msg-bubble">${PrimeSphere.escapeHtml(m.text)}<span class="msg-time">${fmtTime(m.at)}</span></div>
+        </div>`).join('');
+      if(wasAtBottom) chatThread.scrollTop = chatThread.scrollHeight;
+    }
+    chatForm.style.display = '';
+  }
+
+  async function loadThread(accountId){
+    try{
+      const { conversation } = await apiFetch('/messages/conversations/' + encodeURIComponent(accountId));
+      renderThread(conversation);
+      // clear the unread badge locally right away for snappy UI
+      const c = conversations.find(x => x.accountId === accountId);
+      if(c) c.unreadForAdmin = 0;
+      renderConvoList();
+    } catch(err){
+      chatThread.innerHTML = '<div class="chat-empty">' + PrimeSphere.escapeHtml(err.message) + '</div>';
+    }
+  }
+
+  function openConversation(accountId){
+    activeAccountId = accountId;
+    chatThread.innerHTML = '<div class="chat-empty">Loading…</div>';
+    renderConvoList();
+    loadThread(accountId);
+    clearInterval(threadPollTimer);
+    threadPollTimer = setInterval(() => loadThread(activeAccountId), 4000);
+  }
+
+  chatInput.addEventListener('input', () => {
+    chatInput.style.height = 'auto';
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+  });
+  chatInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' && !e.shiftKey){
+      e.preventDefault();
+      chatForm.requestSubmit();
+    }
+  });
+  chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const text = chatInput.value.trim();
+    if(!text || sending || !activeAccountId) return;
+    sending = true;
+    chatSend.disabled = true;
+    try{
+      await apiFetch('/messages/conversations/' + encodeURIComponent(activeAccountId) + '/reply', {
+        method: 'POST', body: JSON.stringify({ text }),
+      });
+      chatInput.value = '';
+      chatInput.style.height = 'auto';
+      await loadThread(activeAccountId);
+      await loadConversations();
+    } catch(err){
+      PrimeSphere.showToast(err.message);
+    } finally {
+      sending = false;
+      chatSend.disabled = false;
+    }
+  });
+
+  function showInbox(){
+    loginSection.style.display = 'none';
+    inboxSection.style.display = '';
+    logoutBtn.style.display = '';
+    loadConversations();
+    clearInterval(convoPollTimer);
+    convoPollTimer = setInterval(loadConversations, 5000);
+  }
+
+  function showLogin(){
+    inboxSection.style.display = 'none';
+    loginSection.style.display = '';
+    logoutBtn.style.display = 'none';
+    clearInterval(convoPollTimer);
+    clearInterval(threadPollTimer);
+  }
+
+  logoutBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    await PrimeSphere.dbDelete(SESSION_KEY, false);
+    session = null;
+    showLogin();
+  });
+
+  const loginForm = document.getElementById('adminLoginForm');
+  const loginError = document.getElementById('adminLoginError');
+  const loginBtn = document.getElementById('adminLoginBtn');
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('adminEmail').value.trim();
+    const password = document.getElementById('adminPassword').value;
+    loginError.classList.remove('show');
+    loginBtn.disabled = true;
+    try{
+      const res = await fetch(API_BASE + '/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if(!res.ok) throw new Error(data.error || 'Something went wrong.');
+      if(data.account.role !== 'admin'){
+        throw new Error('This account does not have admin access.');
+      }
+      session = { authToken: data.token, name: data.account.name, email: data.account.email };
+      await PrimeSphere.dbSet(SESSION_KEY, session, false);
+      showInbox();
+    } catch(err){
+      loginError.textContent = err.message;
+      loginError.classList.add('show');
+    } finally {
+      loginBtn.disabled = false;
+    }
+  });
+
+  (async function init(){
+    session = await PrimeSphere.dbGet(SESSION_KEY, false);
+    if(session && session.authToken){
+      showInbox();
+    } else {
+      showLogin();
+    }
+  })();
+})();
+</script>
+
+</body>
+</html>
