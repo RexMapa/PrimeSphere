@@ -14,17 +14,17 @@
 
 <header>
   <div class="wrap nav">
-    <a href="index.html" class="logo"><img src="images/logo-mark.png" alt="PrimeSphere" class="logo-img"></a>
+    <a href="/" class="logo"><img src="images/logo-mark.png" alt="PrimeSphere" class="logo-img"></a>
     <nav class="nav-links" id="navLinks">
-      <a href="jobs.html">Browse jobs</a>
-      <a href="companies.html">Companies</a>
-      <a href="applications.html">My applications</a>
-      <a href="messages.html">Messages</a>
-      <a href="advice.html">Advice</a>
+      <a href="/jobs">Browse jobs</a>
+      <a href="/companies">Companies</a>
+      <a href="/applications">My applications</a>
+      <a href="/messages">Messages</a>
+      <a href="/advice">Advice</a>
     </nav>
     <div class="nav-right">
-      <a href="login.html" id="loginLink" data-login-link>Log in</a>
-      <a href="post-job.html" class="btn btn-solid">Post a job</a>
+      <a href="/login" id="loginLink" data-login-link>Log in</a>
+      <a href="/post-job" class="btn btn-solid">Post a job</a>
       <button type="button" class="menu-toggle" id="menuToggle" aria-label="Toggle menu" aria-expanded="false"><span></span></button>
     </div>
   </div>
@@ -66,27 +66,27 @@
       <div>
         <h4>For applicants</h4>
         <ul>
-          <li><a href="jobs.html">Browse jobs</a></li>
-          <li><a href="applications.html">My applications</a></li>
-          <li><a href="advice.html">Career advice</a></li>
-          <li><a href="advice.html">Salary guide</a></li>
+          <li><a href="/jobs">Browse jobs</a></li>
+          <li><a href="/applications">My applications</a></li>
+          <li><a href="/advice">Career advice</a></li>
+          <li><a href="/advice">Salary guide</a></li>
         </ul>
       </div>
       <div>
         <h4>For companies</h4>
         <ul>
-          <li><a href="post-job.html">Post a job</a></li>
-          <li><a href="companies.html">Companies hiring</a></li>
-          <li><a href="login.html">Employer login</a></li>
+          <li><a href="/post-job">Post a job</a></li>
+          <li><a href="/companies">Companies hiring</a></li>
+          <li><a href="/login">Employer login</a></li>
         </ul>
       </div>
       <div>
         <h4>PrimeSphere</h4>
         <ul>
-          <li><a href="index.html">About</a></li>
-          <li><a href="advice.html">Contact</a></li>
-          <li><a href="index.html">Privacy</a></li>
-          <li><a href="admin.html">Admin</a></li>
+          <li><a href="/">About</a></li>
+          <li><a href="/advice">Contact</a></li>
+          <li><a href="/">Privacy</a></li>
+          <li><a href="/admin">Admin</a></li>
         </ul>
       </div>
     </div>
@@ -203,7 +203,7 @@ const API_BASE = '/api';
   (async function init(){
     profile = await PrimeSphere.getProfile();
     if(!profile || !profile.authToken){
-      location.href = 'login.html?redirect=messages.html';
+      location.href = '/login?redirect=%2Fmessages';
       return;
     }
     await loadThread();

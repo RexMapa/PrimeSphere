@@ -55,10 +55,10 @@ const PrimeSphere = (function(){
     document.querySelectorAll('[data-login-link]').forEach(link => {
       if(profile && profile.name){
         link.textContent = 'Hi, ' + profile.name.split(' ')[0];
-        link.setAttribute('href', 'account.html');
+        link.setAttribute('href', '/account');
       } else {
         link.textContent = 'Log in';
-        link.setAttribute('href', 'login.html');
+        link.setAttribute('href', '/login');
       }
     });
   }
@@ -104,10 +104,12 @@ const PrimeSphere = (function(){
         menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
       });
     }
-    // highlight current page in nav
-    const here = (location.pathname.split('/').pop() || 'index.html');
+    // highlight current page in nav (clean, extensionless paths, e.g. "/jobs")
+    let here = location.pathname.replace(/\/+$/, '');
+    if(here === '') here = '/';
     document.querySelectorAll('#navLinks a[href]').forEach(a => {
-      if(a.getAttribute('href') === here) a.classList.add('nav-current');
+      const href = a.getAttribute('href').replace(/\/+$/, '') || '/';
+      if(href === here) a.classList.add('nav-current');
     });
   }
 

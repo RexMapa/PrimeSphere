@@ -14,17 +14,17 @@
 
 <header>
   <div class="wrap nav">
-    <a href="index.html" class="logo"><img src="images/logo-mark.png" alt="PrimeSphere" class="logo-img"></a>
+    <a href="/" class="logo"><img src="images/logo-mark.png" alt="PrimeSphere" class="logo-img"></a>
     <nav class="nav-links" id="navLinks">
-      <a href="jobs.html">Browse jobs</a>
-      <a href="companies.html">Companies</a>
-      <a href="applications.html">My applications</a>
-      <a href="messages.html">Messages</a>
-      <a href="advice.html">Advice</a>
+      <a href="/jobs">Browse jobs</a>
+      <a href="/companies">Companies</a>
+      <a href="/applications">My applications</a>
+      <a href="/messages">Messages</a>
+      <a href="/advice">Advice</a>
     </nav>
     <div class="nav-right">
-      <a href="login.html" id="loginLink" data-login-link>Log in</a>
-      <a href="post-job.html" class="btn btn-solid">Post a job</a>
+      <a href="/login" id="loginLink" data-login-link>Log in</a>
+      <a href="/post-job" class="btn btn-solid">Post a job</a>
       <button type="button" class="menu-toggle" id="menuToggle" aria-label="Toggle menu" aria-expanded="false"><span></span></button>
     </div>
   </div>
@@ -37,7 +37,7 @@
       <h1>Work worth <em>showing up</em> for.</h1>
       <p class="lead">Every listing on PrimeSphere is verified, dated, and filed by a real hiring team — no ghost postings, no dead ends. Find the role, apply, and get an answer.</p>
       <div class="hero-ctas">
-        <a href="jobs.html" class="btn btn-rust">Browse open roles</a>
+        <a href="/jobs" class="btn btn-rust">Browse open roles</a>
         <a href="#howItWorks" class="btn">How it works</a>
       </div>
       <div class="hero-stats">
@@ -97,19 +97,19 @@
         <div class="idx-wrap"><span class="idx">01</span></div>
         <h3>Open a file</h3>
         <p>Build a profile once — your experience, your rate, your availability — and reuse it for every application.</p>
-        <a href="login.html">Create account →</a>
+        <a href="/login">Create account →</a>
       </div>
       <div class="dossier-item">
         <div class="idx-wrap"><span class="idx">02</span></div>
         <h3>Find the listing</h3>
         <p>Filter by pay, location, and schedule. Every posting shows who's reviewing it and how fast they reply.</p>
-        <a href="jobs.html">Browse roles →</a>
+        <a href="/jobs">Browse roles →</a>
       </div>
       <div class="dossier-item">
         <div class="idx-wrap"><span class="idx">03</span></div>
         <h3>Submit and track</h3>
         <p>Send your application and watch its status change in real time — seen, shortlisted, or scheduled.</p>
-        <a href="applications.html">See sample tracker →</a>
+        <a href="/applications">See sample tracker →</a>
       </div>
     </div>
   </div>
@@ -141,7 +141,7 @@
     <div class="cta-band-inner">
       <h2>Ready to file your next role?</h2>
       <p>It takes four minutes to build a profile. It takes one click to apply.</p>
-      <a href="login.html" class="btn btn-rust">Create your file</a>
+      <a href="/login" class="btn btn-rust">Create your file</a>
     </div>
   </div>
 </section>
@@ -156,27 +156,27 @@
       <div>
         <h4>For applicants</h4>
         <ul>
-          <li><a href="jobs.html">Browse jobs</a></li>
-          <li><a href="applications.html">My applications</a></li>
-          <li><a href="advice.html">Career advice</a></li>
-          <li><a href="advice.html">Salary guide</a></li>
+          <li><a href="/jobs">Browse jobs</a></li>
+          <li><a href="/applications">My applications</a></li>
+          <li><a href="/advice">Career advice</a></li>
+          <li><a href="/advice">Salary guide</a></li>
         </ul>
       </div>
       <div>
         <h4>For companies</h4>
         <ul>
-          <li><a href="post-job.html">Post a job</a></li>
-          <li><a href="companies.html">Companies hiring</a></li>
-          <li><a href="login.html">Employer login</a></li>
+          <li><a href="/post-job">Post a job</a></li>
+          <li><a href="/companies">Companies hiring</a></li>
+          <li><a href="/login">Employer login</a></li>
         </ul>
       </div>
       <div>
         <h4>PrimeSphere</h4>
         <ul>
-          <li><a href="index.html">About</a></li>
-          <li><a href="advice.html">Contact</a></li>
-          <li><a href="index.html">Privacy</a></li>
-          <li><a href="admin.html">Admin</a></li>
+          <li><a href="/">About</a></li>
+          <li><a href="/advice">Contact</a></li>
+          <li><a href="/">Privacy</a></li>
+          <li><a href="/admin">Admin</a></li>
         </ul>
       </div>
     </div>
@@ -203,7 +203,7 @@
   document.getElementById('searchBtn').addEventListener('click', () => {
     const kw = encodeURIComponent(document.getElementById('searchKeyword').value.trim());
     const city = encodeURIComponent(document.getElementById('searchCity').value.trim());
-    location.href = 'jobs.html?kw=' + kw + '&city=' + city;
+    location.href = '/jobs?kw=' + kw + '&city=' + city;
   });
 })();
 </script>

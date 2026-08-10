@@ -34,7 +34,28 @@ app.use('/api/messages', createMessagesRouter(requireAuth, requireAdmin));
 // Keeping a copy of the site inside ledger-server/public means the app is
 // fully self-contained and works no matter how the host scopes the deploy.
 const SITE_ROOT = path.join(__dirname, '..', 'public');
-app.use(express.static(SITE_ROOT));
+
+// --- Hide the .html extension -------------------------------------------
+// 1) Anyone who types /jobs.html directly (or an old bookmark/search-engine
+//    link) gets redirected to the clean /jobs URL instead of being served
+//    the file, so the .html filename never shows up in the address bar.
+// 2) express.static below is configured with `extensions: ['html']` so the
+//    clean URL (/jobs) still resolves to public/jobs.html on disk, and
+//    `index: 'index.html'` keeps "/" serving the homepage.
+app.get(/^\/(.+)\.html$/, (req, res) => {
+  const clean = '/' + req.params[0];
+  const query = req.originalUrl.includes('?')
+    ? req.originalUrl.slice(req.originalUrl.indexOf('?'))
+    : '';
+  res.redirect(301, (clean === '/index' ? '/' : clean) + query);
+});
+
+app.use(
+  express.static(SITE_ROOT, {
+    extensions: ['html'],
+    index: 'index.html',
+  })
+);
 
 // Fallback error handler
 app.use((err, req, res, next) => {
